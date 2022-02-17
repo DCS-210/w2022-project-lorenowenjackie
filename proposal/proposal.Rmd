@@ -1,7 +1,7 @@
 ---
 title: "Project proposal"
-author: "Team name"
-output: github_document
+author: "Loren, Jackie, Owen"
+output: HTML_document
 ---
 
 ```{r load-packages, message = FALSE}
@@ -14,10 +14,34 @@ library(broom)
 
 
 ## 2. Data
-
+```{r load-data, message = FALSE}
+alldata <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
+glimpse(alldata)
+```
 
 
 ## 3. Data analysis plan
 
+```{r types-of-discovery-methods}
+alldata %>%
+  filter(year == "2020") %>%
+  #arrange(desc(year)) %>%
+  select(country, year, biofuel_electricity, nuclear_electricity, solar_electricity, wind_electricity, hydro_electricity, coal_electricity, gas_electricity)
+```
+```{r example-fig}
+alldata %>%
+  filter(country == "United States" |
+         country == "United Kingdom" |
+         country == "France" |
+         country == "Germany" |
+         country == "China" | 
+         country == "Russia") %>%
+  ggplot(mapping = aes(x = year,
+                      y= solar_energy_per_capita,
+                      color = country,
+                      fill = country)) + 
+geom_line() +
+xlim(2000, 2020)
 
+```
 
