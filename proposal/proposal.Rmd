@@ -88,5 +88,6 @@ In the beginning, we will likely be looking at trends over time and comparing to
 Poudel, P, _World Energy Consumption: Consumption of energy by different countries,_ electronic dataset, viewed 28 February 2022, <https://www.kaggle.com/pralabhpoudel/world-energy-consumption> 
 
 ### Results
+
 When visualizing renewable energy growth and projected growth, correlation coefficients and lines of best fit will be necessary. Based on the preliminary visualization, it looks like solar energy will continue to grow noticably in each country except for Russia. A line of best fit will help quantify exactly how much projected growth there is for each country.
 
