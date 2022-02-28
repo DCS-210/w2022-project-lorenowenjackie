@@ -45,6 +45,10 @@ glimpse(alldata)
 ### Outcome and Predictor Variables 
 Something that interests our group is the growth rate of of renewable energy sources over time. We could, for example, use time as the predictor variable, and shares of solar energy per capita as the outcome variable, and attempt to predict the future trend of solar energy growth.  We can also do this for wind and nuclear energy sources, and compare their growth and projected growth.
 
+## 3. Data analysis plan
+### Outcome and Predictor Variables
+
+
 ### Preliminary Analysis & Summary Stats
 
 ```{r types-of-discovery-methods}
