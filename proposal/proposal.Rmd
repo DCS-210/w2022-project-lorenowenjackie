@@ -45,6 +45,10 @@ glimpse(alldata)
 ### Outcome and Predictor Variables 
 
 
+## 3. Data analysis plan
+### Outcome and Predictor Variables
+
+
 ### Preliminary Analysis & Summary Stats
 
 ```{r types-of-discovery-methods}
