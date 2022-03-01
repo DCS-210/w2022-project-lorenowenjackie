@@ -1,4 +1,5 @@
 # data
+There are 122 variables and 17432 observations in this dataset. 
 
 ## name of data file
 - `iso_code`: ISO 3166-1 alpha-3 three-letter country codes
