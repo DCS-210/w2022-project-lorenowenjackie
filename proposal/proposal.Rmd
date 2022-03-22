@@ -40,6 +40,45 @@ glimpse(alldata)
 ```
 
 ## 3. Data analysis plan
+```{r data-cleaning}
+cleandata <- alldata %>%
+  filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
+  select(country,
+         year,
+         wind_energy_per_capita, 
+         wind_consumption, 
+         wind_share_energy,
+         wind_cons_change_twh,
+         gdp, solar_energy_per_capita,
+         solar_consumption, 
+         solar_share_energy, 
+         solar_cons_change_twh,
+         renewables_energy_per_capita,
+         renewables_consumption,
+         renewables_cons_change_twh,
+         renewables_share_energy, population,
+         nuclear_consumption,
+         nuclear_share_energy,
+         nuclear_cons_change_twh,
+         nuclear_energy_per_capita,
+         hydro_share_energy,
+         hydro_cons_change_twh,
+         hydro_energy_per_capita,
+         hydro_consumption,
+         fossil_cons_change_twh,
+         fossil_fuel_consumption,
+         fossil_energy_per_capita,
+         fossil_share_energy,
+         energy_cons_change_twh,
+         energy_per_gdp,
+         energy_per_capita,
+         biofuel_cons_change_twh,
+         biofuel_share_energy,
+         biofuel_cons_per_capita,
+         biofuel_consumption)
+
+cleandata
+```
 
 ### Outcome and Predictor Variables 
 Something that interests our group is the growth rate of of renewable energy sources over time. We could, for example, use time as the predictor variable, and shares of solar energy per capita as the outcome variable, and attempt to predict the future trend of solar energy growth.  We can also do this for wind and nuclear energy sources, and compare their growth and projected growth.
