@@ -33,19 +33,19 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 ```{r load-data, include=FALSE}
 alldata <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
 
-#Shape files for leaflet maps
-download.file("http://thematicmapping.org/downloads/TM_WORLD_BORDERS_SIMPL-0.3.zip" , destfile="/cloud/project/data/world_shape_file.zip")
-system("unzip /cloud/project/data/world_shape_file.zip")
-
 world_spdf <- readOGR( 
-  dsn= paste0(getwd(),"/DATA/world_shape_file/") , 
+  dsn= ("/cloud/project/data/"), 
   layer="TM_WORLD_BORDERS_SIMPL-0.3",
-  verbose=FALSE)
+  verbose=FALSE
+)
+
+world_spdf2 <- st_read("/cloud/project/data/TM_WORLD_BORDERS_SIMPL-0.3.shp")
 
 # Clean the data object
 library(dplyr)
 world_spdf@data$POP2005[ which(world_spdf@data$POP2005 == 0)] = NA
 world_spdf@data$POP2005 <- as.numeric(as.character(world_spdf@data$POP2005)) / 1000000 %>% round(2)
+
 
 ```
 
@@ -85,6 +85,16 @@ cleandata <- alldata %>%
          biofuel_share_energy,
          biofuel_cons_per_capita,
          biofuel_consumption)
+```
+
+```{r 2020-data-leaflet}
+mostrecentdata <- cleandata %>%
+  filter(year == "2018")
+```
+
+```{r filter-worldspdf}
+mostrecentdata %>% 
+  left_join(world_spdf2, by = c("country" = "NAME"))
 ```
 
 
@@ -156,6 +166,12 @@ or text in two columns $^*$
 # Code
 
 ```{r example-leaflet}
+m <- leaflet(mostrecentdata) %>% 
+  addTiles()  %>% 
+  setView( lat=10, lng=0 , zoom=2) %>%
+  addPolygons(fillColor = ~pal74(mostrecentdata$wind_consumption) )
+
+m
 
 ```
 
