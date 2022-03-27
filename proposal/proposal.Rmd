@@ -37,6 +37,8 @@ The dataset we have chosen is World Energy Consumption, a dataset consisting of 
 ```{r load-data, message = FALSE}
 alldata <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
 glimpse(alldata)
+
+
 ```
 
 ## 3. Data analysis plan
