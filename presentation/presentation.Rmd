@@ -22,7 +22,7 @@ library(tidymodels)
 library(knitr)
 library(xaringanthemer)
 library(leaflet)
-library(rgdal)
+#library(rgdal)
 ```
 
 ```{r setup, include=FALSE}
