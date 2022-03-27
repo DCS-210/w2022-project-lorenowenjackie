@@ -1,7 +1,7 @@
 ---
-title: "Global Renewable Energy Trends"
-subtitle: "Presentation subtitle (if any)"
-author: "Loren, Owen, Jackie"
+title: "World Renewable Energy Consumption"
+subtitle: "For Europe, the UK, the US, Canada, and China"
+author: "Loren, Owen, and Jackie"
 institute: "Bates College"
 date: "`r Sys.Date()`"
 output:
@@ -19,9 +19,11 @@ output:
 # Add any additional packages you need to this chunk
 library(tidyverse)
 library(tidymodels)
-library(palmerpenguins)
 library(knitr)
 library(xaringanthemer)
+library(leaflet)
+library(rgdal)
+library(sf)
 ```
 
 ```{r setup, include=FALSE}
@@ -31,7 +33,74 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 
 ```{r load-data, include=FALSE}
 energy <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
+
+alldata <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
+
+world_spdf <- readOGR( 
+  dsn= ("/cloud/project/data/"), 
+  layer="TM_WORLD_BORDERS_SIMPL-0.3",
+  verbose=FALSE
+)
+
+world_spdf2 <- st_read("/cloud/project/data/TM_WORLD_BORDERS_SIMPL-0.3.shp")
+
+# Clean the data object
+library(dplyr)
+world_spdf@data$POP2005[ which(world_spdf@data$POP2005 == 0)] = NA
+world_spdf@data$POP2005 <- as.numeric(as.character(world_spdf@data$POP2005)) / 1000000 %>% round(2)
+
+
 ```
+
+```{r clean-data}
+cleandata <- alldata %>%
+  filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
+  select(country,
+         year,
+         wind_energy_per_capita, 
+         wind_consumption, 
+         wind_share_energy,
+         wind_cons_change_twh,
+         gdp, solar_energy_per_capita,
+         solar_consumption, 
+         solar_share_energy, 
+         solar_cons_change_twh,
+         renewables_energy_per_capita,
+         renewables_consumption,
+         renewables_cons_change_twh,
+         renewables_share_energy, population,
+         nuclear_consumption,
+         nuclear_share_energy,
+         nuclear_cons_change_twh,
+         nuclear_energy_per_capita,
+         hydro_share_energy,
+         hydro_cons_change_twh,
+         hydro_energy_per_capita,
+         hydro_consumption,
+         fossil_cons_change_twh,
+         fossil_fuel_consumption,
+         fossil_energy_per_capita,
+         fossil_share_energy,
+         energy_cons_change_twh,
+         energy_per_gdp,
+         energy_per_capita,
+         biofuel_cons_change_twh,
+         biofuel_share_energy,
+         biofuel_cons_per_capita,
+         biofuel_consumption)
+```
+
+```{r 2020-data-leaflet}
+mostrecentdata <- cleandata %>%
+  filter(year == "2018")
+```
+
+```{r filter-worldspdf}
+mostrecentdata <- mostrecentdata %>% 
+  left_join(world_spdf2, by = c("country" = "NAME")) %>%
+  st_as_sf()
+```
+
 
 ```{r}
 style_xaringan(
@@ -100,11 +169,17 @@ or text in two columns $^*$
 
 # Code
 
-```{r boring-regression}
-# a boring regression
-model <- lm(dist ~ speed, data = cars)
-tidy(model)
-glance(model)
+```{r example-leaflet}
+bins <- seq(from = 0, to = 1000, by = 20)
+#pal <- colorBin()
+
+m <- leaflet(data = mostrecentdata) %>% 
+  addTiles()  %>% 
+  setView( lat=10, lng=0 , zoom=2) %>%
+  addPolygons(fillColor = )
+
+m
+
 ```
 
 ---
@@ -139,9 +214,7 @@ ggplot(data = iris_modified, mapping = aes(x = Sepal.Width, y = Sepal.Length, co
 ```{r warning=FALSE, out.width="100%", fig.width=4, echo=FALSE}
 # see how I changed out.width and fig.width from defaults
 # to make the figure bigger
-ggplot(penguins, aes(x = bill_length_mm, y = species, color = species)) +
-  geom_boxplot() +
-  theme_minimal()
+
 ```
 ]
 
