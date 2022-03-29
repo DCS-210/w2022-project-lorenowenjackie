@@ -52,7 +52,7 @@ world_spdf@data$POP2005 <- as.numeric(as.character(world_spdf@data$POP2005)) / 1
 
 ```
 
-```{r clean-data}
+```{r clean-data} 
 cleandata <- alldata %>%
   filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
   select(country,
@@ -88,19 +88,8 @@ cleandata <- alldata %>%
          biofuel_share_energy,
          biofuel_cons_per_capita,
          biofuel_consumption)
+#use this data for line plots etc (more consolidated country list)
 ```
-
-```{r 2020-data-leaflet}
-mostrecentdata <- cleandata %>%
-  filter(year == "2018")
-```
-
-```{r filter-worldspdf}
-mostrecentdata <- mostrecentdata %>% 
-  left_join(world_spdf2, by = c("country" = "NAME")) %>%
-  st_as_sf()
-```
-
 
 ```{r}
 style_xaringan(
@@ -109,7 +98,7 @@ style_xaringan(
 ```
 
 
-class: center, middle
+class: center, middle, testing 
 
 ## A statement of the overall goal / research question
 
@@ -204,6 +193,7 @@ leaflettdata <- alldata %>%
          biofuel_share_energy,
          biofuel_cons_per_capita,
          biofuel_consumption)
+#use this data for leaflets - uses all countries 
 ```
 
 ```{r 2018-data-leaflet}

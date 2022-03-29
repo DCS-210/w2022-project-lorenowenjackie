@@ -125,6 +125,7 @@ In the beginning, we will likely be looking at trends over time and comparing to
 
 
 ### Results
+
 When visualizing renewable energy growth and projected growth, correlation coefficients and lines of best fit will be necessary. Based on the preliminary visualization, it looks like solar energy will continue to grow noticably in each country except for Russia. A line of best fit will help quantify exactly how much projected growth there is for each country.
 
 ### References
@@ -145,19 +146,41 @@ ggplot(data = fossildata, mapping = aes(x = year,
 ```
 
 ```{r solar-predictions}
-year_1990 <- fossildata %>%
+year_1990_fossil_fuel_consump <- fossildata %>%
   mutate(year = year - 1990)
 
 m1 <- linear_reg() %>%
   set_engine("lm") %>%
-  fit(fossil_fuel_consumption ~ year*factor(country), data = year_1990)
+  fit(fossil_fuel_consumption ~ year*factor(country), data = year_1990_fossil_fuel_consump)
   
-new_data <- data.frame(year = seq(0, 31), country = rep("China", 32))
-new_data <- new_data %>% 
-  mutate(predicted = predict(m1, new_data), actual = year_1990$fossil_fuel_consumption)
+new_data <- data.frame(year = seq(0, 33), country = rep("China", 34))
+#new_data <- new_data %>% 
+  #mutate(predicted = predict(m1, new_data), actual = year_1990_fossil_fuel_consump$fossil_fuel_consumption)
 ```
 
-```{r leaflet}
+
+```{r wind-consumption-all_countries-plot}
+wind_consumption_data <- cleandata %>%
+  select(wind_consumption, year, country) 
+
+ggplot(data = wind_consumption_data, mapping = aes(x = year, 
+                                        y = wind_consumption, 
+                                        color = country),
+                                        alpha = 0.01)+
+                                
+  geom_point() + geom_smooth(se = FALSE) 
+
+```
+
+
+```{r solar-consumption-all-plot}
+solar_consumption_data <- cleandata %>%
+  select(solar_consumption, year, country) 
+
+ggplot(data = solar_consumption_data, mapping = aes(x = year, 
+                                        y = solar_consumption, 
+                                        color = country)) +
+  geom_point() + geom_smooth(se = FALSE) 
 
 ```
 
