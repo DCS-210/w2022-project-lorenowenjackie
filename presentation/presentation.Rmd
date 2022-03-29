@@ -168,15 +168,64 @@ or text in two columns $^*$
 ---
 
 # Code
+```{r leaflett-data}
+leaflettdata <- alldata %>%
+  filter(year >= 1990) %>%
+  select(country,
+         year,
+         wind_energy_per_capita, 
+         wind_consumption, 
+         wind_share_energy,
+         wind_cons_change_twh,
+         gdp, solar_energy_per_capita,
+         solar_consumption, 
+         solar_share_energy, 
+         solar_cons_change_twh,
+         renewables_energy_per_capita,
+         renewables_consumption,
+         renewables_cons_change_twh,
+         renewables_share_energy, population,
+         nuclear_consumption,
+         nuclear_share_energy,
+         nuclear_cons_change_twh,
+         nuclear_energy_per_capita,
+         hydro_share_energy,
+         hydro_cons_change_twh,
+         hydro_energy_per_capita,
+         hydro_consumption,
+         fossil_cons_change_twh,
+         fossil_fuel_consumption,
+         fossil_energy_per_capita,
+         fossil_share_energy,
+         energy_cons_change_twh,
+         energy_per_gdp,
+         energy_per_capita,
+         biofuel_cons_change_twh,
+         biofuel_share_energy,
+         biofuel_cons_per_capita,
+         biofuel_consumption)
+```
+
+```{r 2018-data-leaflet}
+testleaflet <- leaflettdata %>%
+  filter(year == "2018")
+```
+
+```{r filter-worldspdf}
+testleaflet <- testleaflet %>% 
+  left_join(world_spdf2, by = c("country" = "NAME")) %>%
+  st_as_sf()
+```
+
 
 ```{r example-leaflet}
-bins <- seq(from = 0, to = 1000, by = 20)
-#pal <- colorBin()
+bins <- seq(from = 0, to = 30000, by = 5000)
+pal74 <- colorBin("RdYlGn", domain = testleaflet$renewables_energy_per_capita, bins = bins) 
 
-m <- leaflet(data = mostrecentdata) %>% 
+m <- leaflet(data = testleaflet) %>% 
   addTiles()  %>% 
   setView( lat=10, lng=0 , zoom=2) %>%
-  addPolygons(fillColor = )
+  addPolygons(fillColor = ~pal74(testleaflet$renewables_energy_per_capita))
 
 m
 

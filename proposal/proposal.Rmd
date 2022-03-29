@@ -152,7 +152,7 @@ m1 <- linear_reg() %>%
   set_engine("lm") %>%
   fit(fossil_fuel_consumption ~ year*factor(country), data = year_1990)
   
-new_data <- data.frame(year = seq(0, 33), country = rep("China", 34))
+new_data <- data.frame(year = seq(0, 31), country = rep("China", 32))
 new_data <- new_data %>% 
   mutate(predicted = predict(m1, new_data), actual = year_1990$fossil_fuel_consumption)
 ```
