@@ -22,7 +22,8 @@ library(tidymodels)
 library(knitr)
 library(xaringanthemer)
 library(leaflet)
-#library(rgdal)
+library(rgdal)
+library(sf)
 ```
 
 ```{r setup, include=FALSE}
@@ -31,6 +32,8 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 ```
 
 ```{r load-data, include=FALSE}
+energy <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
+
 alldata <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
 
 world_spdf <- readOGR( 
@@ -93,8 +96,9 @@ mostrecentdata <- cleandata %>%
 ```
 
 ```{r filter-worldspdf}
-mostrecentdata %>% 
-  left_join(world_spdf2, by = c("country" = "NAME"))
+mostrecentdata <- mostrecentdata %>% 
+  left_join(world_spdf2, by = c("country" = "NAME")) %>%
+  st_as_sf()
 ```
 
 
@@ -166,10 +170,13 @@ or text in two columns $^*$
 # Code
 
 ```{r example-leaflet}
-m <- leaflet(mostrecentdata) %>% 
+bins <- seq(from = 0, to = 1000, by = 20)
+#pal <- colorBin()
+
+m <- leaflet(data = mostrecentdata) %>% 
   addTiles()  %>% 
   setView( lat=10, lng=0 , zoom=2) %>%
-  addPolygons(fillColor = ~pal74(mostrecentdata$wind_consumption) )
+  addPolygons(fillColor = )
 
 m
 
