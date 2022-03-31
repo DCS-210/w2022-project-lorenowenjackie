@@ -147,17 +147,23 @@ ggplot(data = fossildata, mapping = aes(x = year,
 ```{r solar-predictions}
 year_1990 <- fossildata %>%
   mutate(year = year - 1990)
+  
+year_1990_china <- year_1990 %>%
+  filter(country == "China") %>%
+  select(year, fossil_fuel_consumption)
 
+a <- c(32, NA)
+b <- c(34, NA)
+year_1990_china <- rbind(year_1990_china, a)
+year_1990_china <- rbind(year_1990_china, b)
+ 
 m1 <- linear_reg() %>%
   set_engine("lm") %>%
-  fit(fossil_fuel_consumption ~ year*factor(country), data = year_1990)
+  fit(fossil_fuel_consumption ~ year*country, data = year_1990)
   
-new_data <- data.frame(year = seq(0, 33), country = rep("China", 34))
+new_data <- data.frame(year = seq(1990, 2024, by = 2), country = rep("China", 18 ))
 new_data <- new_data %>% 
-  mutate(predicted = predict(m1, new_data), actual = year_1990$fossil_fuel_consumption)
+  mutate(predicted = predict(m1, new_data), actual = year_1990_china$fossil_fuel_consumption)
 ```
 
-```{r leaflet}
-
-```
 

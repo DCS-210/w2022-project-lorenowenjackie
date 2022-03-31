@@ -32,8 +32,6 @@ knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618,
 ```
 
 ```{r load-data, include=FALSE}
-energy <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
-
 alldata <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
 
 world_spdf <- readOGR( 
@@ -170,13 +168,13 @@ or text in two columns $^*$
 # Code
 
 ```{r example-leaflet}
-bins <- seq(from = 0, to = 1000, by = 20)
-#pal <- colorBin()
+bins <- seq(from = 0, to = 40000, by = 5000)
+pal <- colorBin("YlOrRd", domain = mostrecentdata$fossil_fuel_consumption, bins = bins)
 
 m <- leaflet(data = mostrecentdata) %>% 
   addTiles()  %>% 
   setView( lat=10, lng=0 , zoom=2) %>%
-  addPolygons(fillColor = )
+  addPolygons(fillColor = ~pal(mostrecentdata$fossil_fuel_consumption))
 
 m
 
