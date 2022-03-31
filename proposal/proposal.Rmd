@@ -185,3 +185,4 @@ ggplot(data = solar_consumption_data, mapping = aes(x = year,
 
 ```
 
+Fix typo 
