@@ -165,10 +165,9 @@ wind_consumption_data <- cleandata %>%
 
 ggplot(data = wind_consumption_data, mapping = aes(x = year, 
                                         y = wind_consumption, 
-                                        color = country),
-                                        alpha = 0.01)+
-                                
-  geom_point() + geom_smooth(se = FALSE) 
+                                        color = country))+
+  geom_point() + stat_smooth(geom='line', alpha=0.5, se=FALSE)                     
+  #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
 
 ```
 
@@ -180,7 +179,10 @@ solar_consumption_data <- cleandata %>%
 ggplot(data = solar_consumption_data, mapping = aes(x = year, 
                                         y = solar_consumption, 
                                         color = country)) +
-  geom_point() + geom_smooth(se = FALSE) 
+  stat_smooth(geom='line', alpha=0.5, se=FALSE)
+  #geom_point(shape = ".") + stat_smooth(geom='line', alpha=0.5, se=FALSE)
+  #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
 
 ```
 
+Fix typo 
