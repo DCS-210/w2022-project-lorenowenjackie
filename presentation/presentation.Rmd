@@ -231,7 +231,7 @@ m
 
 ```
 
-```{r 2018-data-leaflet}
+```{r 1990-data-leaflet}
 ninetyleaflet <- leaflettdata %>%
   filter(year == "1990")
 ```
@@ -242,7 +242,7 @@ ninetyleaflet <- ninetyleaflet %>%
   st_as_sf()
 ```
 
-```{r}
+```{r leaflet-attempt}
 pal3 <- colorNumeric(palette = "RdYlGn", domain = ninetyleaflet$renewables_share_energy)
 pal2 <- colorNumeric(palette = "RdYlGn", domain = testleaflet$renewables_share_energy)
 
@@ -329,7 +329,7 @@ map1
 ---
 
 # Plots
-```{r}
+```{r barchat-data}
 barchartdata <- alldata %>%
   filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
   select(country,
@@ -364,7 +364,7 @@ barcharttransform$country <- factor(barcharttransform$country,
 colnames(barcharttransform)
 ```
 
-```{r}
+```{r barchart-transformed-fig}
 barcharttransform %>%
   filter(year >= 2000) %>%
   ggplot(aes(x = year, y = overall_consumption, fill = energy_type)) +
