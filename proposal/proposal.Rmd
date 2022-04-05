@@ -9,6 +9,8 @@ library(tidyverse)
 library(broom)
 library(parsnip)
 library(tidymodels)
+library(ggplot2)
+library(ggiraph)
 ```
 
 ## 1. Introduction
@@ -166,7 +168,9 @@ wind_consumption_data <- cleandata %>%
 ggplot(data = wind_consumption_data, mapping = aes(x = year, 
                                         y = wind_consumption, 
                                         color = country))+
-  geom_point() + stat_smooth(geom='line', alpha=0.5, se=FALSE)                     
+  geom_point() + stat_smooth(geom='line', alpha=0.5, se=FALSE)
+  #geom_point_interactive(data = wind_consumption_data, aes(x = year, y = wind_consumption, color = country, FIX THIS LATER 
+    #tooltip = carname, data_id = carname))
   #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
 
 ```
