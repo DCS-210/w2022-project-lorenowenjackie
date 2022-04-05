@@ -180,7 +180,6 @@ wind_consumption_data <- cleandata %>%
 wind_consumption_graph <- ggplot(data = wind_consumption_data, mapping = aes(x = year, 
                                         y = wind_consumption, 
                                         color = country))+
-  #geom_point() + stat_smooth(geom='line', alpha=0.5, se=FALSE)+
   stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
   theme_minimal() + 
   labs(title = "Wind Consumption in the Past 20 Years",
@@ -191,6 +190,23 @@ wind_consumption_graph <- ggplot(data = wind_consumption_data, mapping = aes(x =
 ggplotly(wind_consumption_graph)
 ```
 
+```{r wind-consumption-per-capita-all_countries-plot, fig.alt= "Line graph of wind consumption per capita per country per year."}
+wind_energy_per_capita_data <- cleandata %>%
+  filter(year >= 2000) %>%
+  select(wind_energy_per_capita, year, country) 
+
+wind_energy_per_capita_graph <- ggplot(data = wind_energy_per_capita_data, mapping = aes(x = year,
+                                        y = wind_energy_per_capita, 
+                                        color = country))+
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Wind Energy per Capita in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Wind per Capita (TWh)")
+
+ggplotly(wind_energy_per_capita_graph)
+```
 
 ```{r solar-consumption-all-plot, fig.alt= "Line graph of solar consumption per country per year. "}
 solar_consumption_data <- cleandata %>%
@@ -209,4 +225,22 @@ solar_consumption_graph <- ggplot(data = solar_consumption_data, mapping = aes(x
        y = "Primary Energy from Solar (TWh)")
 
 ggplotly(solar_consumption_graph)
+```
+
+
+```{r solar-consumption-per-capita-all-plot, fig.alt= "Line graph of solar consumption per capita per country per year. "}
+solar_energy_per_capita_data <- cleandata %>%
+  filter(year >= 2000) %>%
+  select(solar_energy_per_capita, year, country)
+
+
+solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data, mapping = aes(x = year, y = solar_energy_per_capita, color = country)) +
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Solar Energy per Capita in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Solar per Capita (TWh)")
+
+ggplotly(solar_energy_per_capita_graph)
 ```
