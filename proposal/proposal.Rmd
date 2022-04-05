@@ -163,17 +163,18 @@ m1 <- linear_reg() %>%
   fit(fossil_fuel_consumption ~ year*factor(country), data = year_1990_fossil_fuel_consump)
   
 new_data <- data.frame(year = seq(0, 33), country = rep("China", 34))
+
 #new_data <- new_data %>% 
   #mutate(predicted = predict(m1, new_data), actual = year_1990_fossil_fuel_consump$fossil_fuel_consumption)
 ```
 
 
-```{r wind-consumption-all_countries-plot}
+```{r wind-consumption-all_countries-plot, fig.alt= "Line graph of wind consumption per country per year."}
 wind_consumption_data <- cleandata %>%
   filter(year >= 2000) %>%
   select(wind_consumption, year, country) 
 
-ggplot(data = wind_consumption_data, mapping = aes(x = year, 
+wind_consumption_graph <- ggplot(data = wind_consumption_data, mapping = aes(x = year, 
                                         y = wind_consumption, 
                                         color = country))+
   geom_point() + stat_smooth(geom='line', alpha=0.5, se=FALSE)
@@ -187,16 +188,17 @@ ggplot(data = wind_consumption_data, mapping = aes(x = year,
   #geom_point_interactive(data = wind_consumption_data, aes(x = year, y = wind_consumption, color = country, FIX THIS LATER 
   #tooltip = carname, data_id = carname))
 
+  ggplotly(wind_consumption_graph)
 ```
 
 
-```{r solar-consumption-all-plot}
+```{r solar-consumption-all-plot, fig.alt= "Line graph of solar consumption per country per year. "}
 solar_consumption_data <- cleandata %>%
   filter(year >= 2000) %>%
   select(solar_consumption, year, country)
 
 
-ggplot(data = solar_consumption_data, mapping = aes(x = year, 
+solar_consumption_graph <- ggplot(data = solar_consumption_data, mapping = aes(x = year, 
                                         y = solar_consumption, 
                                         color = country)) +
   stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
@@ -208,6 +210,5 @@ ggplot(data = solar_consumption_data, mapping = aes(x = year,
   #geom_point(shape = ".") + stat_smooth(geom='line', alpha=0.5, se=FALSE)
   #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
 
+ggplotly(solar_consumption_data)
 ```
-
-Fix typo 
