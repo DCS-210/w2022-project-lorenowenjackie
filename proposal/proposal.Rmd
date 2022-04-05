@@ -115,8 +115,10 @@ geom_line() +
 xlim(2000, 2020)+
 labs(title = "The Development of Solar Energy in the Past 20 Years",
      x = "Year ", 
-     y = "Solar Energy Per Capita"
-     )
+     y = "Solar Energy Per Capita (kWh)",
+     subtitle = "Per capita, selected countries of interest"
+     ) + 
+  theme_minimal()
 
 ```
 
@@ -143,8 +145,13 @@ fossildata <- cleandata %>%
 ggplot(data = fossildata, mapping = aes(x = year, 
                                         y = fossil_fuel_consumption, 
                                         color = country)) +
-  geom_point() + geom_smooth(se = FALSE) 
-
+  geom_point() + geom_smooth(se = FALSE) + 
+  theme_minimal() +
+  labs(title = "Fossil Fuel Consumption for China and the United States",
+       subtitle = "By year",
+       x = "Year",
+       y = "Fossil Fuel Consumption (TWh)",
+       color = "Country")
 ```
 
 ```{r solar-predictions}
@@ -163,27 +170,41 @@ new_data <- data.frame(year = seq(0, 33), country = rep("China", 34))
 
 ```{r wind-consumption-all_countries-plot}
 wind_consumption_data <- cleandata %>%
+  filter(year >= 2000) %>%
   select(wind_consumption, year, country) 
 
 ggplot(data = wind_consumption_data, mapping = aes(x = year, 
                                         y = wind_consumption, 
                                         color = country))+
   geom_point() + stat_smooth(geom='line', alpha=0.5, se=FALSE)
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Wind Consumption in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Wind (TWh)")
+  #geom_point() + geom_smooth(alpha = 0.02, se = FALSE)  
   #geom_point_interactive(data = wind_consumption_data, aes(x = year, y = wind_consumption, color = country, FIX THIS LATER 
-    #tooltip = carname, data_id = carname))
-  #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
+  #tooltip = carname, data_id = carname))
 
 ```
 
 
 ```{r solar-consumption-all-plot}
 solar_consumption_data <- cleandata %>%
-  select(solar_consumption, year, country) 
+  filter(year >= 2000) %>%
+  select(solar_consumption, year, country)
+
 
 ggplot(data = solar_consumption_data, mapping = aes(x = year, 
                                         y = solar_consumption, 
                                         color = country)) +
-  stat_smooth(geom='line', alpha=0.5, se=FALSE)
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Solar Consumption in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Solar (TWh)")
   #geom_point(shape = ".") + stat_smooth(geom='line', alpha=0.5, se=FALSE)
   #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
 
