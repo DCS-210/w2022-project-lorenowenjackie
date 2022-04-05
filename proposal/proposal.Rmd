@@ -11,6 +11,9 @@ library(parsnip)
 library(tidymodels)
 library(ggplot2)
 library(ggiraph)
+library(plotly)
+library(gganimate)
+library(gifski)
 ```
 
 ## 1. Introduction
@@ -177,18 +180,15 @@ wind_consumption_data <- cleandata %>%
 wind_consumption_graph <- ggplot(data = wind_consumption_data, mapping = aes(x = year, 
                                         y = wind_consumption, 
                                         color = country))+
-  geom_point() + stat_smooth(geom='line', alpha=0.5, se=FALSE)
+  #geom_point() + stat_smooth(geom='line', alpha=0.5, se=FALSE)+
   stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
   theme_minimal() + 
   labs(title = "Wind Consumption in the Past 20 Years",
        subtitle = "For select countries of interest",
        x = "Year",
        y = "Primary Energy from Wind (TWh)")
-  #geom_point() + geom_smooth(alpha = 0.02, se = FALSE)  
-  #geom_point_interactive(data = wind_consumption_data, aes(x = year, y = wind_consumption, color = country, FIX THIS LATER 
-  #tooltip = carname, data_id = carname))
 
-  ggplotly(wind_consumption_graph)
+ggplotly(wind_consumption_graph)
 ```
 
 
@@ -207,8 +207,6 @@ solar_consumption_graph <- ggplot(data = solar_consumption_data, mapping = aes(x
        subtitle = "For select countries of interest",
        x = "Year",
        y = "Primary Energy from Solar (TWh)")
-  #geom_point(shape = ".") + stat_smooth(geom='line', alpha=0.5, se=FALSE)
-  #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
 
-ggplotly(solar_consumption_data)
+ggplotly(solar_consumption_graph)
 ```
