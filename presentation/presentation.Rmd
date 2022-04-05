@@ -24,6 +24,9 @@ library(xaringanthemer)
 library(leaflet)
 library(rgdal)
 library(sf)
+library(plotly)
+library(gganimate)
+library(gifski)
 ```
 
 ```{r setup, include=FALSE}
@@ -157,7 +160,7 @@ or text in two columns $^*$
 ---
 
 # Code
-```{r leaflett-data}
+```{r leaflet-data}
 leaflettdata <- alldata %>%
   filter(year >= 1990) %>%
   select(country,
@@ -201,7 +204,7 @@ testleaflet <- leaflettdata %>%
   filter(year == "2018")
 ```
 
-```{r filter-worldspdf}
+```{r filter-worldspdf-hippo}
 testleaflet <- testleaflet %>% 
   left_join(world_spdf2, by = c("country" = "NAME")) %>%
   st_as_sf()
@@ -216,7 +219,7 @@ labels <- sprintf("<strong>%s</strong><br/>%s ", testleaflet$country, testleafle
 
 m <- leaflet(data = testleaflet) %>% 
   addTiles()  %>% 
-  setView( lat=10, lng=0 , zoom=2) %>%
+  setView( lat=10, lng=0 , zoom=1) %>%
   addPolygons(fillColor = ~pal2(testleaflet$renewables_share_energy),
                                  fillOpacity = 1, 
                                  color = "white",
@@ -267,7 +270,7 @@ b <- leaflet(data = ninetyleaflet) %>%
                                  #label = labels,
                                  group = "2018") %>%
    addLayersControl(
-    baseGroups = c("1990", "2018"),
+    baseGroups = c("2018", "1990"),
     options = layersControlOptions(collapsed = FALSE))
 
     #addLegend("bottomright", pal = pal3, values = ~ninetyleaflet$renewables_share_energy,
@@ -297,8 +300,6 @@ pal2 <- colorNumeric(palette = "RdYlGn", domain = multiyeardata$eightteendata)
 #  lapply(htmltools::HTML)
 
 map1 <- leaflet(data = multiyeardata) %>% 
-  addTiles()  %>% 
-  setView( lat=10, lng=0 , zoom=2) %>%
   addPolygons(fillColor = ~pal2(multiyeardata$eightteendata),
                                  fillOpacity = 1, 
                                  color = "white",
@@ -313,7 +314,7 @@ map1 <- leaflet(data = multiyeardata) %>%
                                  weight = 1,
                                  #label = labels,
                                  group = "1990") %>%
-   
+  setView( lat=10, lng=0 , zoom=2) %>%
    addLayersControl(
     baseGroups = c("2018", "1990"),
     options = layersControlOptions(collapsed = FALSE))
@@ -343,18 +344,17 @@ barchartdata <- alldata %>%
          gas_consumption,
          oil_consumption)
 
-barchartdata <- transform(barchartdata, overall_consumption=(wind_consumption+ 
-         solar_consumption+ 
-         nuclear_consumption+
-         hydro_consumption+
-         biofuel_consumption+
-         coal_consumption+
-         gas_consumption+
+barchartdata <- transform(barchartdata, overall_consumption = (wind_consumption+ 
+         solar_consumption + 
+         nuclear_consumption +
+         hydro_consumption +
+         biofuel_consumption +
+         coal_consumption +
+         gas_consumption +
          oil_consumption))
 
 
 barcharttransform <- gather(barchartdata, key = "energy_type", value = "consumption", -country, -year, -overall_consumption)
-
 
 barcharttransform <- barcharttransform[order(-barcharttransform$overall_consumption),]
 
@@ -378,6 +378,56 @@ barcharttransform %>%
   theme_minimal() + 
   scale_fill_brewer(palette = "RdYlGn")
 ```
+
+```{r china-usa-bar}
+barchartchinausa <- barcharttransform %>%
+  filter(country %in% c("United States", "China"), year >= 2000)
+
+ggplot( data = barchartchinausa, aes(x = year, 
+                                     y = overall_consumption, 
+                                     fill = energy_type)) +
+  geom_area() + 
+  facet_wrap(vars(country)) + 
+  labs(title = "Energy consumption by for China and the USA",
+       subtitle = "2000-2020",
+       x = "Year",
+       y = "Primary Energy Consumption (TWh)",
+       fill = "Energy Type") + 
+  theme_minimal() + 
+  scale_fill_brewer(palette = "RdYlGn")
+```
+```{r usa-interactive-plot}
+barchartusa <- barcharttransform %>%
+  filter(country %in% c("United States"), year >= 2000)
+
+g <- barchartusa %>%
+  ggplot(aes(x = year, y = overall_consumption, fill = energy_type)) +
+  geom_area() + 
+  labs(title = "Energy consumption by for China and the USA",
+       subtitle = "2000-2020",
+       x = "Year",
+       y = "Primary Energy Consumption (TWh)",
+       fill = "Energy Type") + 
+  theme_minimal() + 
+  scale_fill_brewer(palette = "RdYlGn")
+
+ggplotly(g)
+```
+```{r leaflet-join-spatial}
+leaflettdata <- leaflettdata %>% 
+ left_join(world_spdf2, by = c("country" = "NAME")) %>%
+ st_as_sf()
+```
+
+```{r time-lapse}
+multiyearfig <- ggplot(leaflettdata) + 
+  geom_sf(aes(fill = renewables_share_energy)) +
+  labs(fill = "Renewable Share of Energy") + 
+  transition_time(year)
+
+multiyearfig
+```
+
 
 
 
