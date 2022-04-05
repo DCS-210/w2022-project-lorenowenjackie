@@ -9,11 +9,12 @@ library(tidyverse)
 library(broom)
 library(parsnip)
 library(tidymodels)
-library(ggplot2)
 library(ggiraph)
 library(plotly)
 library(gganimate)
 library(gifski)
+library(ggplot2)
+library(patchwork)
 ```
 
 ## 1. Introduction
