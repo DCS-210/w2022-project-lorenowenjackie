@@ -212,7 +212,7 @@ testleaflet <- testleaflet %>%
 
 
 ```{r example-leaflet}
-#pal2 <- colorQuantile("RdYlGn", testleaflet$renewables_share_energy, n = 11)
+#2018 leaflet 
 pal2 <- colorNumeric(palette = "RdYlGn", domain = testleaflet$renewables_share_energy)
 labels <- sprintf("<strong>%s</strong><br/>%s ", testleaflet$country, testleaflet$renewables_share_energy) %>%
   lapply(htmltools::HTML)
@@ -246,6 +246,7 @@ ninetyleaflet <- ninetyleaflet %>%
 ```
 
 ```{r leaflet-attempt}
+#attempt at making leaflet where you can switch between years (uses two data frames)
 pal3 <- colorNumeric(palette = "RdYlGn", domain = ninetyleaflet$renewables_share_energy)
 pal2 <- colorNumeric(palette = "RdYlGn", domain = testleaflet$renewables_share_energy)
 
@@ -293,6 +294,7 @@ multiyeardata <- multiyeardata %>%
 ```
 
 ```{r multi-year-leaflet}
+#attempt at making leaflet where you can switch between years using one data frame 
 pal3 <- colorNumeric(palette = "RdYlGn", domain = multiyeardata$ninetydata)
 pal2 <- colorNumeric(palette = "RdYlGn", domain = multiyeardata$eightteendata)
 
@@ -331,6 +333,7 @@ map1
 
 # Plots
 ```{r barchat-data}
+#cleaning data to make bar charts 
 barchartdata <- alldata %>%
   filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
   select(country,
@@ -383,7 +386,7 @@ barcharttransform %>%
 barchartchinausa <- barcharttransform %>%
   filter(country %in% c("United States", "China"), year >= 2000)
 
-ggplot( data = barchartchinausa, aes(x = year, 
+fig <- ggplot( data = barchartchinausa, aes(x = year, 
                                      y = overall_consumption, 
                                      fill = energy_type)) +
   geom_area() + 
@@ -395,24 +398,11 @@ ggplot( data = barchartchinausa, aes(x = year,
        fill = "Energy Type") + 
   theme_minimal() + 
   scale_fill_brewer(palette = "RdYlGn")
-```
-```{r usa-interactive-plot}
-barchartusa <- barcharttransform %>%
-  filter(country %in% c("United States"), year >= 2000)
 
-g <- barchartusa %>%
-  ggplot(aes(x = year, y = overall_consumption, fill = energy_type)) +
-  geom_area() + 
-  labs(title = "Energy consumption by for China and the USA",
-       subtitle = "2000-2020",
-       x = "Year",
-       y = "Primary Energy Consumption (TWh)",
-       fill = "Energy Type") + 
-  theme_minimal() + 
-  scale_fill_brewer(palette = "RdYlGn")
-
-ggplotly(g)
+ggplotly(fig)
 ```
+
+
 ```{r leaflet-join-spatial}
 leaflettdata <- leaflettdata %>% 
  left_join(world_spdf2, by = c("country" = "NAME")) %>%
