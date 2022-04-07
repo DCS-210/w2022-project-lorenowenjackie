@@ -125,6 +125,7 @@ In the beginning, we will likely be looking at trends over time and comparing to
 
 
 ### Results
+
 When visualizing renewable energy growth and projected growth, correlation coefficients and lines of best fit will be necessary. Based on the preliminary visualization, it looks like solar energy will continue to grow noticably in each country except for Russia. A line of best fit will help quantify exactly how much projected growth there is for each country.
 
 ### References
@@ -135,35 +136,111 @@ Poudel, P, _World Energy Consumption: Consumption of energy by different countri
 ```{r fossil-fuel-consumption-plot}
 fossildata <- cleandata %>%
   select(fossil_fuel_consumption, year, country) %>%
-  filter(country == c("United States", "China"))
-
-ggplot(data = fossildata, mapping = aes(x = year, 
-                                        y = fossil_fuel_consumption, 
-                                        color = country)) +
-  geom_point() + geom_smooth(se = FALSE) 
-
+  filter(country == c("United States", "China")) %>%
+  mutate(year = year - 1990)
 ```
 
-```{r solar-predictions}
-year_1990 <- fossildata %>%
-  mutate(year = year - 1990)
-  
-year_1990_china <- year_1990 %>%
+```{r fossil-predictions-china}
+year_1990_china <- fossildata %>%
   filter(country == "China") %>%
-  select(year, fossil_fuel_consumption)
+  select(country, year, fossil_fuel_consumption)
 
-a <- c(32, NA)
-b <- c(34, NA)
+a <- c('China', 32, NA)
+b <- c('China', 34, NA)
+c <- c('China', 36, NA)
+d <- c('China', 38, NA)
+e <- c('China', 40, NA)
 year_1990_china <- rbind(year_1990_china, a)
 year_1990_china <- rbind(year_1990_china, b)
+year_1990_china <- rbind(year_1990_china, c)
+year_1990_china <- rbind(year_1990_china, d)
+year_1990_china <- rbind(year_1990_china, e)
+
+year_1990_china$year <- as.numeric(year_1990_china$year)
+
  
-m1 <- linear_reg() %>%
+m_china <- linear_reg() %>%
   set_engine("lm") %>%
-  fit(fossil_fuel_consumption ~ year*country, data = year_1990)
+  fit(fossil_fuel_consumption ~ year, data = year_1990_china)
   
-new_data <- data.frame(year = seq(1990, 2024, by = 2), country = rep("China", 18 ))
-new_data <- new_data %>% 
-  mutate(predicted = predict(m1, new_data), actual = year_1990_china$fossil_fuel_consumption)
+new_fossil_china <- data.frame(year = seq(1990, 2030, by = 2), country =
+                                rep("China", 21 ))
+new_fossil_china <- new_fossil_china %>% 
+  mutate(predicted = predict(m_china, year_1990_china)$.pred, actual =
+           year_1990_china$fossil_fuel_consumption)
+```
+
+```{r fossil-predictions-USA}
+year_1990_USA <- fossildata %>%
+  filter(country == "United States") %>%
+  select(country, year, fossil_fuel_consumption)
+
+a <- c('United States', 32, NA)
+b <- c('United States', 34, NA)
+c <- c('United States', 36, NA)
+d <- c('United States', 38, NA)
+e <- c('United States', 40, NA)
+year_1990_USA <- rbind(year_1990_USA, a)
+year_1990_USA <- rbind(year_1990_USA, b)
+year_1990_USA <- rbind(year_1990_USA, c)
+year_1990_USA <- rbind(year_1990_USA, d)
+year_1990_USA <- rbind(year_1990_USA, e)
+year_1990_USA$year <- as.numeric(year_1990_USA$year)
+
+ 
+m_USA <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(fossil_fuel_consumption ~ year, data = year_1990_USA)
+  
+new_fossil_USA <- data.frame(year = seq(1990, 2030, by = 2), country =
+                                rep("United States", 21 ))
+
+new_fossil_USA <- new_fossil_USA %>% 
+  mutate(predicted = predict(m_USA, year_1990_USA)$.pred, 
+         actual = year_1990_USA$fossil_fuel_consumption) 
+```
+
+```{r USA-vs-China-fossil-predictions}
+fossil_preds <- rbind(new_fossil_china, new_fossil_USA)
+ggplot(data = fossil_preds, mapping = aes(color = country)) + 
+  geom_smooth(data = fossil_preds, mapping = aes(x = year, 
+                                                 y = as.numeric(predicted))) + 
+  geom_point(data = fossil_preds, mapping = aes(x = year,
+                                                y = as.numeric(actual))) + 
+  labs(y = 'Fossil Fuel Consumption',
+       x = 'Year',
+       color = 'Country',
+       subtitle = 'Actual vs. Projected Data',
+       title = 'Fossil Fuel Consumption in the USA and China since 1990') +
+  theme_minimal() +
+  geom_label(mapping = aes(x = 2010,
+                           y = 40000,
+                           label = 'R^2 China: .946  R^2 USA:  .141'))
 ```
 
 
+```{r wind-consumption-all_countries-plot}
+wind_consumption_data <- cleandata %>%
+  select(wind_consumption, year, country) 
+
+ggplot(data = wind_consumption_data, mapping = aes(x = year, 
+                                        y = wind_consumption, 
+                                        color = country))+
+  geom_point() + stat_smooth(geom='line', alpha=0.5, se=FALSE)                     
+  #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
+
+```
+
+
+```{r solar-consumption-all-plot}
+solar_consumption_data <- cleandata %>%
+  select(solar_consumption, year, country) 
+
+ggplot(data = solar_consumption_data, mapping = aes(x = year, 
+                                        y = solar_consumption, 
+                                        color = country)) +
+  stat_smooth(geom='line', alpha=0.5, se=FALSE)
+  #geom_point(shape = ".") + stat_smooth(geom='line', alpha=0.5, se=FALSE)
+  #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
+
+```
