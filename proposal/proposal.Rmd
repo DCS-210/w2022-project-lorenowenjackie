@@ -271,7 +271,7 @@ barcharttransform$country <- factor(barcharttransform$country,
   
 colnames(barcharttransform)
 ```
-
+ 
 ```{r barchartchinausa, echo = FALSE, message = FALSE, warning = FALSE}
 barchartchinausa <- barcharttransform %>%
   mutate(isrenewable = case_when(energy_type == "wind_consumption" ~ "Yes",
