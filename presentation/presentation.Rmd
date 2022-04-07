@@ -408,18 +408,7 @@ leaflettdata <- leaflettdata %>%
  left_join(world_spdf2, by = c("country" = "NAME")) %>%
  st_as_sf()
 ```
-
-```{r time-lapse}
-multiyearfig <- ggplot(leaflettdata) + 
-  geom_sf(aes(fill = renewables_share_energy)) +
-  labs(fill = "Renewable Share of Energy") + 
-  transition_time(year)
-
-multiyearfig
-```
-
-
-
+ 
 
 ```{r recode-species, echo = FALSE}
 # In this chunk I'm doing a bunch of analysis that I don't want to present 
