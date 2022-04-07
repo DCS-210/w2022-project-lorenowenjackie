@@ -1,0 +1,500 @@
+---
+title: "World Renewable Energy Consumption"
+subtitle: "For Europe, the UK, the US, Canada, and China"
+author: "Loren, Owen, and Jackie"
+institute: "Bates College"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      ratio: "16:9"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r load-packages, include = FALSE}
+# Add any additional packages you need to this chunk
+library(tidyverse)
+library(tidymodels)
+library(knitr)
+library(xaringanthemer)
+library(leaflet)
+library(rgdal)
+library(sf)
+library(plotly)
+library(gganimate)
+library(gifski)
+```
+
+```{r setup, include=FALSE}
+# For better figure resolution
+knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618, out.width = "80%")
+```
+
+```{r load-data, include=FALSE}
+energy <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
+
+alldata <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
+
+world_spdf <- readOGR( 
+  dsn= ("/cloud/project/data/"), 
+  layer="TM_WORLD_BORDERS_SIMPL-0.3",
+  verbose=FALSE
+)
+
+world_spdf2 <- st_read("/cloud/project/data/TM_WORLD_BORDERS_SIMPL-0.3.shp")
+
+# Clean the data object
+library(dplyr)
+world_spdf@data$POP2005[ which(world_spdf@data$POP2005 == 0)] = NA
+world_spdf@data$POP2005 <- as.numeric(as.character(world_spdf@data$POP2005)) / 1000000 %>% round(2)
+
+
+```
+
+```{r clean-data} 
+cleandata <- alldata %>%
+  filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
+  select(country,
+         year,
+         wind_energy_per_capita, 
+         wind_consumption, 
+         wind_share_energy,
+         wind_cons_change_twh,
+         gdp, solar_energy_per_capita,
+         solar_consumption, 
+         solar_share_energy, 
+         solar_cons_change_twh,
+         renewables_energy_per_capita,
+         renewables_consumption,
+         renewables_cons_change_twh,
+         renewables_share_energy, population,
+         nuclear_consumption,
+         nuclear_share_energy,
+         nuclear_cons_change_twh,
+         nuclear_energy_per_capita,
+         hydro_share_energy,
+         hydro_cons_change_twh,
+         hydro_energy_per_capita,
+         hydro_consumption,
+         fossil_cons_change_twh,
+         fossil_fuel_consumption,
+         fossil_energy_per_capita,
+         fossil_share_energy,
+         energy_cons_change_twh,
+         energy_per_gdp,
+         energy_per_capita,
+         biofuel_cons_change_twh,
+         biofuel_share_energy,
+         biofuel_cons_per_capita,
+         biofuel_consumption)
+#use this data for line plots etc (more consolidated country list)
+```
+
+```{r}
+style_xaringan(
+  title_slide_background_image = "img/confetti.jpg"
+)
+```
+
+
+class: center, middle, testing 
+
+## A statement of the overall goal / research question
+
+---
+
+class: inverse, center, middle
+
+# Section title
+
+---
+
+# Hello World
+
+- Click the `Knit` button to compile your presentation
+
+- Make sure to commit and push all resulting files to your GitHub repo
+
+---
+
+class: inverse, middle, center
+
+# Using xaringan
+
+---
+
+# xaringan
+
+- The presentation is created using the `xaringan` package
+
+- Use `---` to separate slides and `--` for incremental builds
+
+--
+
+- Like this
+
+---
+
+# Layouts
+
+You can use plain text
+
+- or bullet points
+
+.pull-left[
+or text in two columns $^*$
+]
+.pull-right[
+- like
+- this
+]
+
+.footnote[
+[*] And add footnotes
+]
+
+---
+
+# Code
+```{r leaflet-data}
+leaflettdata <- alldata %>%
+  filter(year >= 1990) %>%
+  select(country,
+         year,
+         wind_energy_per_capita, 
+         wind_consumption, 
+         wind_share_energy,
+         wind_cons_change_twh,
+         gdp, solar_energy_per_capita,
+         solar_consumption, 
+         solar_share_energy, 
+         solar_cons_change_twh,
+         renewables_energy_per_capita,
+         renewables_consumption,
+         renewables_cons_change_twh,
+         renewables_share_energy, population,
+         nuclear_consumption,
+         nuclear_share_energy,
+         nuclear_cons_change_twh,
+         nuclear_energy_per_capita,
+         hydro_share_energy,
+         hydro_cons_change_twh,
+         hydro_energy_per_capita,
+         hydro_consumption,
+         fossil_cons_change_twh,
+         fossil_fuel_consumption,
+         fossil_energy_per_capita,
+         fossil_share_energy,
+         energy_cons_change_twh,
+         energy_per_gdp,
+         energy_per_capita,
+         biofuel_cons_change_twh,
+         biofuel_share_energy,
+         biofuel_cons_per_capita,
+         biofuel_consumption)
+#use this data for leaflets - uses all countries 
+```
+
+```{r 2018-data-leaflet}
+testleaflet <- leaflettdata %>%
+  filter(year == "2018")
+```
+
+```{r filter-worldspdf-hippo}
+testleaflet <- testleaflet %>% 
+  left_join(world_spdf2, by = c("country" = "NAME")) %>%
+  st_as_sf()
+```
+
+
+```{r example-leaflet}
+#2018 leaflet 
+pal2 <- colorNumeric(palette = "RdYlGn", domain = testleaflet$renewables_share_energy)
+labels <- sprintf("<strong>%s</strong><br/>%s ", testleaflet$country, testleaflet$renewables_share_energy) %>%
+  lapply(htmltools::HTML)
+
+m <- leaflet(data = testleaflet) %>% 
+  addTiles()  %>% 
+  setView( lat=10, lng=0 , zoom=1) %>%
+  addPolygons(fillColor = ~pal2(testleaflet$renewables_share_energy),
+                                 fillOpacity = 1, 
+                                 color = "white",
+                                 opacity = 0.7,
+                                 weight = 1,
+                                 label = labels) %>%
+  addLegend("bottomright", pal = pal2, values = ~testleaflet$renewables_share_energy,
+    title = "2018 Renewable<br> Energy Share",
+    opacity = 1)
+
+m
+
+```
+
+```{r 1990-data-leaflet}
+ninetyleaflet <- leaflettdata %>%
+  filter(year == "1990")
+```
+
+```{r filter-worldspdf}
+ninetyleaflet <- ninetyleaflet %>% 
+  left_join(world_spdf2, by = c("country" = "NAME")) %>%
+  st_as_sf()
+```
+
+```{r leaflet-attempt}
+#attempt at making leaflet where you can switch between years (uses two data frames)
+pal3 <- colorNumeric(palette = "RdYlGn", domain = ninetyleaflet$renewables_share_energy)
+pal2 <- colorNumeric(palette = "RdYlGn", domain = testleaflet$renewables_share_energy)
+
+#labels <- sprintf("<strong>%s</strong><br/>%s ", ninetyleaflet$country, #ninetyleaflet$renewables_share_energy) %>%
+#  lapply(htmltools::HTML)
+
+b <- leaflet(data = ninetyleaflet) %>% 
+  addTiles()  %>% 
+  setView( lat=10, lng=0 , zoom=2) %>%
+  addPolygons(fillColor = ~pal3(ninetyleaflet$renewables_share_energy),
+                                 fillOpacity = 1, 
+                                 color = "white",
+                                 opacity = 0.7,
+                                 weight = 1,
+                                 #label = labels,
+                                 group = "1990") %>%
+   addPolygons(fillColor = ~pal2(testleaflet$renewables_share_energy),
+                                 fillOpacity = 1, 
+                                 color = "white",
+                                 opacity = 0.7,
+                                 weight = 1,
+                                 #label = labels,
+                                 group = "2018") %>%
+   addLayersControl(
+    baseGroups = c("2018", "1990"),
+    options = layersControlOptions(collapsed = FALSE))
+
+    #addLegend("bottomright", pal = pal3, values = ~ninetyleaflet$renewables_share_energy,
+    #title = "1990 Renewable<br> Energy Share",
+    #opacity = 1)
+  
+  
+b
+```
+```{r multi-year-data}
+multiyeardata <- leaflettdata %>%
+  filter(year %in% c("1990", "2018")) %>%
+  mutate(eightteendata = case_when(year == "2018" ~ renewables_share_energy),
+         ninetydata = case_when(year == "1990" ~ renewables_share_energy)
+         )
+
+multiyeardata <- multiyeardata %>% 
+  left_join(world_spdf2, by = c("country" = "NAME")) %>%
+  st_as_sf()
+```
+
+```{r multi-year-leaflet}
+#attempt at making leaflet where you can switch between years using one data frame 
+pal3 <- colorNumeric(palette = "RdYlGn", domain = multiyeardata$ninetydata)
+pal2 <- colorNumeric(palette = "RdYlGn", domain = multiyeardata$eightteendata)
+
+#labels <- sprintf("<strong>%s</strong><br/>%s ", ninetyleaflet$country, #ninetyleaflet$renewables_share_energy) %>%
+#  lapply(htmltools::HTML)
+
+map1 <- leaflet(data = multiyeardata) %>% 
+  addPolygons(fillColor = ~pal2(multiyeardata$eightteendata),
+                                 fillOpacity = 1, 
+                                 color = "white",
+                                 opacity = 0.7,
+                                 weight = 1,
+                                 #label = labels,
+                                 group = "2018") %>%
+  addPolygons(fillColor = ~pal3(multiyeardata$ninetydata),
+                                 fillOpacity = 1, 
+                                 color = "white",
+                                 opacity = 0.7,
+                                 weight = 1,
+                                 #label = labels,
+                                 group = "1990") %>%
+  setView( lat=10, lng=0 , zoom=2) %>%
+   addLayersControl(
+    baseGroups = c("2018", "1990"),
+    options = layersControlOptions(collapsed = FALSE))
+
+    #addLegend("bottomright", pal = pal3, values = ~ninetyleaflet$renewables_share_energy,
+    #title = "1990 Renewable<br> Energy Share",
+    #opacity = 1)
+  
+  
+map1
+```
+
+---
+
+# Plots
+```{r barchat-data}
+#cleaning data to make bar charts 
+barchartdata <- alldata %>%
+  filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
+  select(country,
+         year,
+         wind_consumption, 
+         solar_consumption, 
+         nuclear_consumption,
+         hydro_consumption,
+         biofuel_consumption,
+         coal_consumption,
+         gas_consumption,
+         oil_consumption)
+
+barchartdata <- transform(barchartdata, overall_consumption = (wind_consumption+ 
+         solar_consumption + 
+         nuclear_consumption +
+         hydro_consumption +
+         biofuel_consumption +
+         coal_consumption +
+         gas_consumption +
+         oil_consumption))
+
+
+barcharttransform <- gather(barchartdata, key = "energy_type", value = "consumption", -country, -year, -overall_consumption)
+
+barcharttransform <- barcharttransform[order(-barcharttransform$overall_consumption),]
+
+barcharttransform$country <- factor(barcharttransform$country, 
+ levels = unique(barcharttransform$country))
+  
+colnames(barcharttransform)
+```
+
+```{r barchart-transformed-fig}
+barcharttransform %>%
+  filter(year >= 2000) %>%
+  ggplot(aes(x = year, y = overall_consumption, fill = energy_type)) +
+  geom_bar(position="stack", stat="identity") + 
+  facet_wrap(vars(country)) + 
+  labs(title = "Energy consumption by country",
+       subtitle = "2000-2020",
+       x = "Year",
+       y = "Primary Energy Consumption (TWh)",
+       fill = "Energy Type") + 
+  theme_minimal() + 
+  scale_fill_brewer(palette = "RdYlGn")
+```
+
+```{r china-usa-bar}
+barchartchinausa <- barcharttransform %>%
+  filter(country %in% c("United States", "China"), year >= 2000)
+
+fig <- ggplot( data = barchartchinausa, aes(x = year, 
+                                     y = overall_consumption, 
+                                     fill = energy_type)) +
+  geom_area() + 
+  facet_wrap(vars(country)) + 
+  labs(title = "Energy consumption by for China and the USA",
+       subtitle = "2000-2020",
+       x = "Year",
+       y = "Primary Energy Consumption (TWh)",
+       fill = "Energy Type") + 
+  theme_minimal() + 
+  scale_fill_brewer(palette = "RdYlGn")
+
+ggplotly(fig)
+```
+
+
+```{r leaflet-join-spatial}
+leaflettdata <- leaflettdata %>% 
+ left_join(world_spdf2, by = c("country" = "NAME")) %>%
+ st_as_sf()
+```
+ 
+
+```{r recode-species, echo = FALSE}
+# In this chunk I'm doing a bunch of analysis that I don't want to present 
+# in my slides. But I need the resulting data frame for a plot I want to present.
+iris_modified <- iris %>%
+  mutate(Species = fct_other(Species, keep = "setosa"))
+```
+
+```{r plot-iris, echo = FALSE}
+# Code hidden with echo = FALSE
+# Uses modified iris dataset from previous chunk
+# Play around with height and width until you're happy with the look
+ggplot(data = iris_modified, mapping = aes(x = Sepal.Width, y = Sepal.Length, color = Species)) +
+  geom_point() + 
+  theme_minimal() # theme options: https://ggplot2.tidyverse.org/reference/ggtheme.html
+```
+
+---
+
+## Plot and text
+
+.pull-left[
+- Some text
+- goes here
+]
+.pull-right[
+```{r warning=FALSE, out.width="100%", fig.width=4, echo=FALSE}
+# see how I changed out.width and fig.width from defaults
+# to make the figure bigger
+
+```
+]
+
+---
+
+# Tables
+
+If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
+
+```{r iris-table, echo = FALSE}
+kable(head(iris), format = "html")
+```
+
+---
+
+# Images
+
+```{r castle, echo = FALSE, out.width = "60%", fig.align = "center", fig.cap = "Image credit: Photo by Jörg Angeli on Unsplash."}
+include_graphics("https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80")
+```
+
+Or you can also include a full page image. See next slide.
+
+---
+
+background-image: url(https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80)
+
+---
+
+# Math Expressions
+
+You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
+
+```
+$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+```
+
+$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+
+Limitations:
+
+1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
+
+1. There should not be spaces after the opening `$` or before the closing `$`.
+
+1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
+
+---
+
+# Feeling adventurous?
+
+- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
+
+- You are welcomed to use the default styling of the slides. In fact, that's what I expect majority of you will do. You will differentiate yourself with the content of your presentation.
+
+- But some of you might want to play around with slide styling. The 
+`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
+
+- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
