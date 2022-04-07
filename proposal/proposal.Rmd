@@ -43,13 +43,13 @@ Sub questions:
 The dataset we have chosen is World Energy Consumption, a dataset consisting of key metrics of energy usage (primary energy, per capita, growth rates, energy mix, electricy mix, and other metrics) from Kaggle. This data set is part of Our World in Data, which seeks to collect data and research the worlds largest problems. Currently this data set contains 122 columns of variables, and over 17,000 observations for each country from 1900 to the present. There are many observations which have "NA" as their entry, so it is likely we will need to clean the data quite a bit, or focused on some specific countries of interest with complete data. 
 
 ## 2. Data
-```{r load-data, message = FALSE}
+```{r load-data, message = FALSE, echo = FALSE}
 alldata <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
 glimpse(alldata)
 ```
 
 ## 3. Data analysis plan
-```{r data-cleaning}
+```{r data-cleaning, message = FALSE, echo = FALSE, warning = FALSE}
 cleandata <- alldata %>%
   filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
   select(country,
@@ -94,7 +94,7 @@ Something that interests our group is the growth rate of of renewable energy sou
 
 ### Preliminary Analysis & Summary Stats
 
-```{r types-of-discovery-methods}
+```{r types-of-discovery-methods, message = FALSE, echo = FALSE, warning = FALSE}
 alldata %>%
   filter(country == "United States",
          year >= 1965) %>%
@@ -104,16 +104,16 @@ alldata %>%
 
 This table shows us the trajectory of energy shares in the United States from 1965-present (the data begins for these categories in 1965). The trends shows the fossil fuel shares have gone down over time, as renewables and nuclear have risen. This is a good starting off point which could be cool to visualize, especially with other countries. 
 
-```{r example-fig}
-alldata %>%
+```{r example-fig, message = FALSE, echo = FALSE, warning = FALSE}
+solardata <- alldata %>%
   filter(country == "United States" |
          country == "United Kingdom" |
          country == "France" |
          country == "Germany" |
          country == "China" | 
-         country == "Russia") %>%
+         country == "Russia")
 
-  ggplot(mapping = aes(x = year,
+ fig5 <- ggplot(data = solardata, mapping = aes(x = year,
                       y= solar_energy_per_capita,
                       color = country,
                       fill = country)) + 
@@ -125,6 +125,8 @@ labs(title = "The Development of Solar Energy in the Past 20 Years",
      subtitle = "Per capita, selected countries of interest"
      ) + 
   theme_minimal()
+ 
+ggplotly(fig5)
 
 ```
 
@@ -143,7 +145,7 @@ When visualizing renewable energy growth and projected growth, correlation coeff
 Poudel, P, _World Energy Consumption: Consumption of energy by different countries,_ electronic dataset, viewed 28 February 2022, <https://www.kaggle.com/pralabhpoudel/world-energy-consumption> 
 
 ### Plots
-```{r fossil-fuel-consumption-plot}
+```{r fossil-fuel-consumption-plot, echo = FALSE, message = FALSE, warning = FALSE}
 fossildata <- cleandata %>%
   select(fossil_fuel_consumption, year, country) %>%
   filter(country == c("United States", "China"))
@@ -161,7 +163,7 @@ fig3 <- ggplot(data = fossildata, mapping = aes(x = year,
 ggplotly(fig3)
 ```
 
-```{r solar-predictions}
+```{r solar-predictions, echo = FALSE, message = FALSE, warning = FALSE}
 year_1990_fossil_fuel_consump <- fossildata %>%
   mutate(year = year - 1990)
 
@@ -175,12 +177,12 @@ new_data <- data.frame(year = seq(0, 33), country = rep("China", 34))
 ```
 
 
-```{r wind-consumption-all_countries-plot}
+```{r wind-consumption-all_countries-plot, message = FALSE, echo = FALSE, warning = FALSE}
 wind_consumption_data <- cleandata %>%
   filter(year >= 2000) %>%
   select(wind_consumption, year, country) 
 
-ggplot(data = wind_consumption_data, mapping = aes(x = year, 
+fig10 <- ggplot(data = wind_consumption_data, mapping = aes(x = year, 
                                         y = wind_consumption, 
                                         color = country))+
   stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
@@ -191,11 +193,12 @@ ggplot(data = wind_consumption_data, mapping = aes(x = year,
        y = "Primary Energy from Wind (TWh)")
   #geom_point() + geom_smooth(alpha = 0.02, se = FALSE)  + 
 
+ggplotly(fig10)
 
 ```
 
 
-```{r solar-consumption-all-plot}
+```{r solar-consumption-all-plot, echo = FALSE, message = FALSE, warning = FALSE}
 solar_consumption_data <- cleandata %>%
   filter(year >= 2000) %>%
   select(solar_consumption, year, country)
@@ -214,7 +217,8 @@ ggplot(data = solar_consumption_data, mapping = aes(x = year,
   #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
 
 ```
-```{r barchat-data}
+
+```{r barchat-data, echo = FALSE, message = FALSE, warning = FALSE}
 #cleaning data to make bar charts 
 barchartdata <- alldata %>%
   filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
@@ -248,7 +252,8 @@ barcharttransform$country <- factor(barcharttransform$country,
   
 colnames(barcharttransform)
 ```
-```{r barchartchinausa}
+
+```{r barchartchinausa, echo = FALSE, message = FALSE, warning = FALSE}
 barchartchinausa <- barcharttransform %>%
   mutate(isrenewable = case_when(energy_type == "wind_consumption" ~ "Yes",
                                  energy_type == "solar_consumption" ~ "Yes",

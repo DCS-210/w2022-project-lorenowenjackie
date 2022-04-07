@@ -161,7 +161,7 @@ or text in two columns $^*$
 ---
 
 # Code
-```{r leaflet-data}
+```{r leaflet-data, echo = FALSE, message = FALSE, warning = FALSE}
 leaflettdata <- alldata %>%
   filter(year >= 1990) %>%
   select(country,
@@ -201,19 +201,19 @@ leaflettdata <- alldata %>%
 #use this data for leaflets - uses all countries 
 ```
 
-```{r 2018-data-leaflet}
+```{r 2018-data-leaflet, echo = FALSE, message = FALSE, warning = FALSE}
 testleaflet <- leaflettdata %>%
   filter(year == "2018")
 ```
 
-```{r filter-worldspdf-hippo}
+```{r filter-worldspdf-hippo, echo = FALSE, message = FALSE, warning = FALSE}
 testleaflet <- testleaflet %>% 
   left_join(world_spdf2, by = c("country" = "NAME")) %>%
   st_as_sf()
 ```
+---
 
-
-```{r example-leaflet}
+```{r 2018-leaflet, echo = FALSE, message = FALSE, warning = FALSE}
 #2018 leaflet 
 pal2 <- colorNumeric(palette = "RdYlGn", domain = testleaflet$renewables_share_energy)
 labels <- sprintf("<strong>%s</strong><br/>%s ", testleaflet$country, testleaflet$renewables_share_energy) %>%
@@ -235,19 +235,19 @@ m <- leaflet(data = testleaflet) %>%
 m
 
 ```
-
-```{r 1990-data-leaflet}
+---
+```{r 1990-data-leaflet, echo = FALSE, message = FALSE, warning = FALSE}
 ninetyleaflet <- leaflettdata %>%
   filter(year == "1990")
 ```
 
-```{r filter-worldspdf}
+```{r filter-worldspdf, echo = FALSE, message = FALSE, warning = FALSE}
 ninetyleaflet <- ninetyleaflet %>% 
   left_join(world_spdf2, by = c("country" = "NAME")) %>%
   st_as_sf()
 ```
 
-```{r}
+```{r ninety-leaflet, echo = FALSE, message = FALSE, warning = FALSE}
 pal2 <- colorNumeric(palette = "RdYlGn", domain = ninetyleaflet$renewables_share_energy)
 labels <- sprintf("<strong>%s</strong><br/>%s ", ninetyleaflet$country, ninetyleaflet$renewables_share_energy) %>%
   lapply(htmltools::HTML)
@@ -267,15 +267,15 @@ b <- leaflet(data = ninetyleaflet) %>%
 
 b
 ```
-
-```{r}
+---
+```{r final-leaflet, echo = FALSE, message = FALSE, warning = FALSE}
 leafsync::sync(b,m, ncol = 2, sync = "all")
 ```
 
 ---
 
 # Plots
-```{r barchat-data}
+```{r barchat-data, echo = FALSE, message = FALSE, warning = FALSE}
 #cleaning data to make bar charts 
 barchartdata <- alldata %>%
   filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
@@ -309,8 +309,8 @@ barcharttransform$country <- factor(barcharttransform$country,
   
 colnames(barcharttransform)
 ```
-
-```{r barchart-transformed-fig}
+---
+```{r barchart-transformed-fig, echo = FALSE, message = FALSE, warning = FALSE}
 barcharttransform %>%
   filter(year >= 2000) %>%
   ggplot(aes(x = year, y = overall_consumption, fill = factor(energy_type, 
@@ -332,99 +332,51 @@ barcharttransform %>%
   theme_minimal() + 
   scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Wind", "Solar", "Hydro", "Biofuel"))
 ```
-
-```{r china-usa-bar}
+---
+```{r china-usa-bar, echo = FALSE, message = FALSE, warning = FALSE}
 barchartchinausa <- barcharttransform %>%
   filter(country %in% c("United States", "China"), year >= 2000)
 
-fig <- ggplot( data = barchartchinausa, aes(x = year, 
+fig <- ggplot(data = barchartchinausa, aes(x = year, 
                                      y = overall_consumption, 
-                                     fill = energy_type)) +
-  geom_bar(position="stack", stat="identity") + 
+                                     fill = factor(energy_type, 
+                                                   levels = c("oil_consumption",
+                                                              "coal_consumption",
+                                                              "gas_consumption",
+                                                              "nuclear_consumption",
+                                                              "wind_consumption", 
+                                                              "solar_consumption", 
+                                                              "hydro_consumption", 
+                                                              "biofuel_consumption")) )) +
+  geom_area() + 
   facet_wrap(vars(country)) + 
   labs(title = "Energy consumption by for China and the USA",
        subtitle = "2000-2020",
        x = "Year",
        y = "Primary Energy Consumption (TWh)",
        fill = "Energy Type") + 
-  theme_minimal() + 
-  scale_fill_brewer(palette = "RdYlGn")
-
-ggplotly(fig)
-```
-
-```{r bar-chart-percents}
-barchartcons <- alldata %>%
-  filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
-  select(country,
-         year,
-         wind_share_energy, 
-         solar_share_energy, 
-         nuclear_share_energy,
-         hydro_share_energy,
-         biofuel_share_energy,
-         coal_share_energy,
-         gas_share_energy,
-         oil_share_energy)
-
-barchartcons <- transform(barchartcons, overall_consumption = (wind_share_energy + 
-         solar_share_energy + 
-         nuclear_share_energy+ 
-         hydro_share_energy+
-         biofuel_share_energy+
-         coal_share_energy+
-         gas_share_energy+
-         oil_share_energy))
-
-
-barchartedited <- gather(barchartcons, key = "energy_type", value = "consumption", -country, -year, -overall_consumption)
-
-barchartcons <- barchartedited[order(-barchartedited$overall_consumption),]
-
-barchartedited$country <- factor(barchartedited$country, 
- levels = unique(barchartedited$country))
-  
-colnames(barchartedited)
-```
-
-```{r}
-barchartedited %>%
-  filter(year >= 2000) %>%
-  ggplot(aes(x = year, y = overall_consumption, fill = factor(energy_type, 
-                                                   levels = c("oil_share_energy",
-                                                              "coal_share_energy",
-                                                              "gas_share_energy",
-                                                              "nuclear_share_energy",
-                                                              "wind_share_energy", 
-                                                              "solar_share_energy", 
-                                                              "hydro_share_energy", 
-                                                              "biofuel_share_energy")))) +
-  geom_bar(position="stack", stat="identity") + 
-  facet_wrap(vars(country)) + 
-  labs(title = "Energy consumption by country",
-       subtitle = "2000-2020",
-       x = "Year",
-       y = "Primary Energy Consumption (TWh)",
-       fill = "Energy Type") + 
-  theme_minimal() + 
+  theme_minimal()  + 
   scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Wind", "Solar", "Hydro", "Biofuel"))
+fig
+
 ```
 
 
+```
 
 ```{r leaflet-join-spatial}
-leaflettdata <- leaflettdata %>% 
- left_join(world_spdf2, by = c("country" = "NAME")) %>%
- st_as_sf()
+# leaflettdata <- leaflettdata %>% 
+#  left_join(world_spdf2, by = c("country" = "NAME")) %>%
+ #st_as_sf()
 ```
 
 ```{r time-lapse}
-multiyearfig <- ggplot(leaflettdata) + 
-  geom_sf(aes(fill = renewables_share_energy)) +
-  labs(fill = "Renewable Share of Energy") + 
-  transition_time(year)
+#multiyearfig <- ggplot(leaflettdata) + 
+ # geom_sf(aes(fill = renewables_share_energy)) +
+#  labs(fill = "Renewable Share of Energy") + 
+ # transition_time(year)
 
-multiyearfig
+#multiyearfig
 ```
 
 
