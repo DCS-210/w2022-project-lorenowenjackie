@@ -333,7 +333,7 @@ barcharttransform %>%
   scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Wind", "Solar", "Hydro", "Biofuel"))
 ```
 ---
-```{r china-usa-bar, echo = FALSE, message = FALSE, warning = FALSE}
+```{r china-usa-bar, echo=FALSE, message=FALSE, warning=FALSE}
 barchartchinausa <- barcharttransform %>%
   filter(country %in% c("United States", "China"), year >= 2000)
 
