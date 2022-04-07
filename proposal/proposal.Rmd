@@ -2,7 +2,7 @@
 title: "Project proposal - Global Renewable Energy Trends"
 author: "Loren, Jackie, Owen"
 output: html_document  
----
+--- 
 
 ```{r load-packages, message = FALSE}
 library(tidyverse)
@@ -363,4 +363,4 @@ nuclear_energy_per_capita_graph <- ggplot(data = nuclear_consumption_per_capita_
 
 nuclear_energy_per_capita_graph
 ggplotly(nuclear_energy_per_capita_graph)
-```
+``` 
