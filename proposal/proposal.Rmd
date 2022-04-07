@@ -9,6 +9,13 @@ library(tidyverse)
 library(broom)
 library(parsnip)
 library(tidymodels)
+library(plotly)
+library(gganimate)
+library(leaflet)
+library(rgdal)
+library(sf)
+library(gifski)
+library(leafsync)
 ```
 
 ## 1. Introduction
@@ -105,11 +112,12 @@ alldata %>%
          country == "Germany" |
          country == "China" | 
          country == "Russia") %>%
+
   ggplot(mapping = aes(x = year,
                       y= solar_energy_per_capita,
                       color = country,
                       fill = country)) + 
-geom_line() +
+stat_smooth(geom='line', alpha=0.5, se=FALSE) +
 xlim(2000, 2020)+
 labs(title = "The Development of Solar Energy in the Past 20 Years",
      x = "Year ", 
@@ -140,7 +148,7 @@ fossildata <- cleandata %>%
   select(fossil_fuel_consumption, year, country) %>%
   filter(country == c("United States", "China"))
 
-ggplot(data = fossildata, mapping = aes(x = year, 
+fig3 <- ggplot(data = fossildata, mapping = aes(x = year, 
                                         y = fossil_fuel_consumption, 
                                         color = country)) +
   geom_point() + geom_smooth(se = FALSE) + 
@@ -150,6 +158,7 @@ ggplot(data = fossildata, mapping = aes(x = year,
        x = "Year",
        y = "Fossil Fuel Consumption (TWh)",
        color = "Country")
+ggplotly(fig3)
 ```
 
 ```{r solar-predictions}
@@ -205,5 +214,75 @@ ggplot(data = solar_consumption_data, mapping = aes(x = year,
   #geom_point() + geom_smooth(alpha = 0.02, se = FALSE) 
 
 ```
+```{r barchat-data}
+#cleaning data to make bar charts 
+barchartdata <- alldata %>%
+  filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
+  select(country,
+         year,
+         wind_consumption, 
+         solar_consumption, 
+         nuclear_consumption,
+         hydro_consumption,
+         biofuel_consumption,
+         coal_consumption,
+         gas_consumption,
+         oil_consumption)
 
-Fix typo 
+barchartdata <- transform(barchartdata, overall_consumption = (wind_consumption+ 
+         solar_consumption + 
+         nuclear_consumption +
+         hydro_consumption +
+         biofuel_consumption +
+         coal_consumption +
+         gas_consumption +
+         oil_consumption))
+
+
+barcharttransform <- gather(barchartdata, key = "energy_type", value = "consumption", -country, -year, -overall_consumption)
+
+barcharttransform <- barcharttransform[order(-barcharttransform$overall_consumption),]
+
+barcharttransform$country <- factor(barcharttransform$country, 
+ levels = unique(barcharttransform$country))
+  
+colnames(barcharttransform)
+```
+```{r barchartchinausa}
+barchartchinausa <- barcharttransform %>%
+  mutate(isrenewable = case_when(energy_type == "wind_consumption" ~ "Yes",
+                                 energy_type == "solar_consumption" ~ "Yes",
+                                 energy_type == "hydro_consumption" ~ "Yes",
+                                 energy_type == "biofuel_consumption" ~ "Yes",
+                                 energy_type == "nuclear_consumption" ~ "No",
+                                 energy_type == "oil_consumption" ~ "No",
+                                 energy_type == "coal_consumption" ~ "No",
+                                 energy_type == "gas_consumption" ~ "No")) %>%
+  filter(country %in% c("United States", "China"), year >= 2000)
+
+#energy_type <- ordered(barchartchinausa$energy_type, levels = c("wind_consumption", #"solar_consumption", "hydro_consumption", "biofuel_consumption", "nuclear_consumption", #"oil_consumption", "coal_consumption","gas_consumption")) 
+
+
+fig <- ggplot(data = barchartchinausa, aes(x = year, 
+                                     y = overall_consumption, 
+                                     fill = factor(energy_type, 
+                                                   levels = c("oil_consumption",
+                                                              "coal_consumption",
+                                                              "gas_consumption",
+                                                              "nuclear_consumption",
+                                                              "wind_consumption", 
+                                                              "solar_consumption", 
+                                                              "hydro_consumption", 
+                                                              "biofuel_consumption")) )) +
+  geom_area() + 
+  facet_wrap(vars(country)) + 
+  labs(title = "Energy consumption by for China and the USA",
+       subtitle = "2000-2020",
+       x = "Year",
+       y = "Primary Energy Consumption (TWh)",
+       fill = "Energy Type") + 
+  theme_minimal()  + 
+  scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Wind", "Solar", "Hydro", "Biofuel"))
+fig
+#ggplotly(fig, tooltip = c("energy_type", "year"))
+```
