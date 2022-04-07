@@ -144,11 +144,8 @@ Poudel, P, _World Energy Consumption: Consumption of energy by different countri
 ```{r fossil-fuel-consumption-plot}
 fossildata <- cleandata %>%
   select(fossil_fuel_consumption, year, country) %>%
-<<<<<<< HEAD
   filter(country == c("United States", "China")) %>%
   mutate(year = year - 1990)
-=======
-  filter(country == c("United States", "China"))
 
 ggplot(data = fossildata, mapping = aes(x = year, 
                                         y = fossil_fuel_consumption, 
@@ -160,7 +157,6 @@ ggplot(data = fossildata, mapping = aes(x = year,
        x = "Year",
        y = "Fossil Fuel Consumption (TWh)",
        color = "Country")
->>>>>>> e490e1fcbfa7f0d9794bd5ffe63599bec11e1de9
 ```
 
 ```{r fossil-predictions-china}
@@ -215,7 +211,6 @@ m_USA <- linear_reg() %>%
   set_engine("lm") %>%
   fit(fossil_fuel_consumption ~ year, data = year_1990_USA)
   
-<<<<<<< HEAD
 new_fossil_USA <- data.frame(year = seq(1990, 2030, by = 2), country =
                                 rep("United States", 21 ))
 
@@ -240,12 +235,6 @@ ggplot(data = fossil_preds, mapping = aes(color = country)) +
   geom_label(mapping = aes(x = 2010,
                            y = 40000,
                            label = 'R^2 China: .946  R^2 USA:  .141'))
-=======
-new_data <- data.frame(year = seq(0, 33), country = rep("China", 34))
-
-#new_data <- new_data %>% 
-  #mutate(predicted = predict(m1, new_data), actual = year_1990_fossil_fuel_consump$fossil_fuel_consumption)
->>>>>>> e490e1fcbfa7f0d9794bd5ffe63599bec11e1de9
 ```
 
 
@@ -262,7 +251,7 @@ wind_consumption_graph <- ggplot(data = wind_consumption_data, mapping = aes(x =
   labs(title = "Wind Consumption in the Past 20 Years",
        subtitle = "For select countries of interest",
        x = "Year",
-       y = "Primary Energy from Wind (TWh)")
+       y = "Primary Energy from Wind (TWh)")  
 
 ggplotly(wind_consumption_graph)
 ```
@@ -301,10 +290,7 @@ solar_consumption_graph <- ggplot(data = solar_consumption_data, mapping = aes(x
        x = "Year",
        y = "Primary Energy from Solar (TWh)")
 
-ggplotly(solar_consumption_graph)
 ```
-<<<<<<< HEAD
-=======
 
 
 ```{r solar-consumption-per-capita-all-plot, fig.alt= "Line graph of solar consumption per capita per country per year. "}
@@ -321,6 +307,5 @@ solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data, map
        x = "Year",
        y = "Primary Energy from Solar per Capita (TWh)")
 
-ggplotly(solar_energy_per_capita_graph)
+
 ```
->>>>>>> e490e1fcbfa7f0d9794bd5ffe63599bec11e1de9
