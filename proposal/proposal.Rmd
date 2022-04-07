@@ -1,7 +1,7 @@
 ---
 title: "Project proposal - Global Renewable Energy Trends"
 author: "Loren, Jackie, Owen"
-output: html_document
+output: html_document  
 ---
 
 ```{r load-packages, message = FALSE}
@@ -17,7 +17,6 @@ library(sf)
 library(gifski)
 library(leafsync)
 library(ggplot2)
-library(patchwork)
 ```
 
 ## 1. Introduction
@@ -127,7 +126,7 @@ labs(title = "The Development of Solar Energy in the Past 20 Years",
      subtitle = "Per capita, selected countries of interest"
      ) + 
   theme_minimal()
- 
+
 ggplotly(fig5)
 
 ```
@@ -152,7 +151,8 @@ fossildata <- cleandata %>%
   select(fossil_fuel_consumption, year, country) %>%
   filter(country == c("United States", "China"))
 
-fig3 <- ggplot(data = fossildata, mapping = aes(x = year, 
+
+fossil_fuel_graph <- ggplot(data = fossildata, mapping = aes(x = year, 
                                         y = fossil_fuel_consumption, 
                                         color = country)) +
   geom_point() + geom_smooth(se = FALSE) + 
@@ -162,7 +162,8 @@ fig3 <- ggplot(data = fossildata, mapping = aes(x = year,
        x = "Year",
        y = "Fossil Fuel Consumption (TWh)",
        color = "Country")
-ggplotly(fig3)
+
+ggplotly(fossil_fuel_graph)
 ```
 
 ```{r solar-predictions, echo = FALSE, message = FALSE, warning = FALSE}
@@ -213,6 +214,7 @@ wind_energy_per_capita_graph <- ggplot(data = wind_energy_per_capita_data, mappi
        y = "Primary Energy from Wind per Capita (TWh)")
 
 ggplotly(wind_energy_per_capita_graph)
+
 ```
 
 ```{r solar-consumption-all-plot, fig.alt= "Line graph of solar consumption per country per year. ", echo = FALSE, message = FALSE, warning = FALSE}
@@ -324,4 +326,41 @@ solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data, map
        y = "Primary Energy from Solar per Capita (TWh)")
 
 ggplotly(solar_energy_per_capita_graph)
+```
+
+```{r nuclear-consumption-all-plot, fig.alt= "Line graph of nuclear consumption per country per year. "}
+nuclear_consumption_data <- cleandata %>%
+  filter(year >= 2000) %>%
+  select(nuclear_consumption, year, country)
+
+
+nuclear_consumption_graph <- ggplot(data = nuclear_consumption_data, mapping = aes(x = year, 
+                                        y = nuclear_consumption, 
+                                        color = country)) +
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Nuclear Consumption in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Solar (TWh)")
+
+ggplotly(nuclear_consumption_graph)
+```
+
+```{r nuclear-consumption-per-capita-plot, fig.alt= "Line graph of nuclear consumption per country per capita per year. "}
+nuclear_consumption_per_capita_data <- cleandata %>%
+  filter(year >= 2000) %>%
+  select(nuclear_energy_per_capita, year, country)
+
+
+nuclear_energy_per_capita_graph <- ggplot(data = nuclear_consumption_per_capita_data, mapping = aes(x = year, y = nuclear_energy_per_capita, color = country)) +
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Nuclear Consumption in the Past 20 Years per Capita",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Nuclear (TWh)")
+
+nuclear_energy_per_capita_graph
+ggplotly(nuclear_energy_per_capita_graph)
 ```
