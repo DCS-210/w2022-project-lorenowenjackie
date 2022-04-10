@@ -5,7 +5,7 @@ author: "Loren, Owen, and Jackie"
 institute: "Bates College"
 date: "`r Sys.Date()`"
 output:
-  xaringan::moon_reader: 
+  xaringan::moon_reader:  
     css: xaringan-themer.css
     lib_dir: libs
     nature:
@@ -369,17 +369,6 @@ fig
 #  left_join(world_spdf2, by = c("country" = "NAME")) %>%
  #st_as_sf()
 ```
-
-```{r time-lapse}
-#multiyearfig <- ggplot(leaflettdata) + 
- # geom_sf(aes(fill = renewables_share_energy)) +
-#  labs(fill = "Renewable Share of Energy") + 
- # transition_time(year)
-
-#multiyearfig
-```
-
-
 
 
 ```{r recode-species, echo = FALSE}

@@ -149,7 +149,8 @@ Poudel, P, _World Energy Consumption: Consumption of energy by different countri
 ```{r fossil-fuel-consumption-plot, echo = FALSE, message = FALSE, warning = FALSE}
 fossildata <- cleandata %>%
   select(fossil_fuel_consumption, year, country) %>%
-  filter(country == c("United States", "China"))
+  filter(country == c("United States", "China")) %>%
+  mutate(year = year - 1990)
 
 
 fossil_fuel_graph <- ggplot(data = fossildata, mapping = aes(x = year, 
@@ -166,18 +167,88 @@ fossil_fuel_graph <- ggplot(data = fossildata, mapping = aes(x = year,
 ggplotly(fossil_fuel_graph)
 ```
 
+
 ```{r solar-predictions, echo = FALSE, message = FALSE, warning = FALSE}
 year_1990_fossil_fuel_consump <- fossildata %>%
   mutate(year = year - 1990)
+```
 
-m1 <- linear_reg() %>%
+```{r fossil-predictions-china}
+year_1990_china <- fossildata %>%
+  filter(country == "China") %>%
+  select(country, year, fossil_fuel_consumption)
+
+a <- c('China', 32, NA)
+b <- c('China', 34, NA)
+c <- c('China', 36, NA)
+d <- c('China', 38, NA)
+e <- c('China', 40, NA)
+year_1990_china <- rbind(year_1990_china, a)
+year_1990_china <- rbind(year_1990_china, b)
+year_1990_china <- rbind(year_1990_china, c)
+year_1990_china <- rbind(year_1990_china, d)
+year_1990_china <- rbind(year_1990_china, e)
+
+year_1990_china$year <- as.numeric(year_1990_china$year)
+
+ 
+m_china <- linear_reg() %>%
   set_engine("lm") %>%
-  fit(fossil_fuel_consumption ~ year*factor(country), data = year_1990_fossil_fuel_consump)
+  fit(fossil_fuel_consumption ~ year, data = year_1990_china)
   
-new_data <- data.frame(year = seq(0, 33), country = rep("China", 34))
+new_fossil_china <- data.frame(year = seq(1990, 2030, by = 2), country =
+                                rep("China", 21 ))
+new_fossil_china <- new_fossil_china %>% 
+  mutate(predicted = predict(m_china, year_1990_china)$.pred, actual =
+           year_1990_china$fossil_fuel_consumption)
+```
 
-#new_data <- new_data %>% 
-  #mutate(predicted = predict(m1, new_data), actual = year_1990_fossil_fuel_consump$fossil_fuel_consumption)
+```{r fossil-predictions-USA}
+year_1990_USA <- fossildata %>%
+  filter(country == "United States") %>%
+  select(country, year, fossil_fuel_consumption)
+
+a <- c('United States', 32, NA)
+b <- c('United States', 34, NA)
+c <- c('United States', 36, NA)
+d <- c('United States', 38, NA)
+e <- c('United States', 40, NA)
+year_1990_USA <- rbind(year_1990_USA, a)
+year_1990_USA <- rbind(year_1990_USA, b)
+year_1990_USA <- rbind(year_1990_USA, c)
+year_1990_USA <- rbind(year_1990_USA, d)
+year_1990_USA <- rbind(year_1990_USA, e)
+year_1990_USA$year <- as.numeric(year_1990_USA$year)
+
+ 
+m_USA <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(fossil_fuel_consumption ~ year, data = year_1990_USA)
+  
+new_fossil_USA <- data.frame(year = seq(1990, 2030, by = 2), country =
+                                rep("United States", 21 ))
+
+new_fossil_USA <- new_fossil_USA %>% 
+  mutate(predicted = predict(m_USA, year_1990_USA)$.pred, 
+         actual = year_1990_USA$fossil_fuel_consumption) 
+```
+
+```{r USA-vs-China-fossil-predictions}
+fossil_preds <- rbind(new_fossil_china, new_fossil_USA)
+ggplot(data = fossil_preds, mapping = aes(color = country)) + 
+  geom_smooth(data = fossil_preds, mapping = aes(x = year, 
+                                                 y = as.numeric(predicted))) + 
+  geom_point(data = fossil_preds, mapping = aes(x = year,
+                                                y = as.numeric(actual))) + 
+  labs(y = 'Fossil Fuel Consumption',
+       x = 'Year',
+       color = 'Country',
+       subtitle = 'Actual vs. Projected Data',
+       title = 'Fossil Fuel Consumption in the USA and China since 1990') +
+  theme_minimal() +
+  geom_label(mapping = aes(x = 2010,
+                           y = 40000,
+                           label = 'R^2 China: .946  R^2 USA:  .141'))
 ```
 
 ```{r wind-consumption-all_countries-plot, message = FALSE, echo = FALSE, warning = FALSE, fig.alt= "Line graph of wind consumption per country per year."}
@@ -193,7 +264,7 @@ wind_consumption_graph <- ggplot(data = wind_consumption_data, mapping = aes(x =
   labs(title = "Wind Consumption in the Past 20 Years",
        subtitle = "For select countries of interest",
        x = "Year",
-       y = "Primary Energy from Wind (TWh)")
+       y = "Primary Energy from Wind (TWh)")  
 
 ggplotly(wind_consumption_graph)
 ```
@@ -233,7 +304,6 @@ solar_consumption_graph <- ggplot(data = solar_consumption_data, mapping = aes(x
        x = "Year",
        y = "Primary Energy from Solar (TWh)")
 
-ggplotly(solar_consumption_graph)
 ```
 
 
@@ -271,7 +341,7 @@ barcharttransform$country <- factor(barcharttransform$country,
   
 colnames(barcharttransform)
 ```
-
+ 
 ```{r barchartchinausa, echo = FALSE, message = FALSE, warning = FALSE}
 barchartchinausa <- barcharttransform %>%
   mutate(isrenewable = case_when(energy_type == "wind_consumption" ~ "Yes",
@@ -308,7 +378,7 @@ fig <- ggplot(data = barchartchinausa, aes(x = year,
   theme_minimal()  + 
   scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Wind", "Solar", "Hydro", "Biofuel"))
 fig
-#ggplotly(fig, tooltip = c("energy_type", "year"))
+ggplotly(fig, tooltip = c("energy_type", "year"))
 ```
 
 ```{r solar-consumption-per-capita-all-plot, fig.alt= "Line graph of solar consumption per capita per country per year. "}
@@ -364,3 +434,4 @@ nuclear_energy_per_capita_graph <- ggplot(data = nuclear_consumption_per_capita_
 nuclear_energy_per_capita_graph
 ggplotly(nuclear_energy_per_capita_graph)
 ``` 
+
