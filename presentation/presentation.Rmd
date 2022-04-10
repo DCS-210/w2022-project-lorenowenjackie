@@ -53,7 +53,7 @@ library(dplyr)
 world_spdf@data$POP2005[ which(world_spdf@data$POP2005 == 0)] = NA
 world_spdf@data$POP2005 <- as.numeric(as.character(world_spdf@data$POP2005)) / 1000000 %>% round(2)
 
-
+ 
 ```
 
 ```{r clean-data} 
