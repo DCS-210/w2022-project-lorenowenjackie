@@ -29,8 +29,6 @@ library(gganimate)
 library(gifski)
 library(leafsync)
 library(htmltools)
-library(gridExtra)
-library(ggpubr)
 library(patchwork)
 ```
 
@@ -108,13 +106,19 @@ style_xaringan(
 
 
 ## We see the impact of climate change in the news and all around us every day, but what are countries doing about it? 
+.pull-left[
 - A recent report from the Intergovernmental Panel on Climate Change highlighted that the world needs to invest three to six times what it’s currently spending on mitigating climate change if it wants to limit global warming to 1.5 or 2 degrees Celsius (1)
 
-
-
 - Although wealthier countries contribute the most to climate change, poor countries feel the effects disproportionately
+]
 
+.pull-right[
+```{r climatechange, echo = FALSE, out.width = "80%", fig.align= "right"}
 
+include_graphics("img/wildfire.jpeg")
+
+```
+]
 .footnote[
 [1] Source: Zhong, Raymond. “5 Takeaways From the U.N. Report on Limiting Global Warming.” The New York Times, 4 Apr. 2022, https://www.nytimes.com/2022/04/04/climate/ipcc-report-explained.html. Accessed 10 Apr. 2022. 
 ]
@@ -241,6 +245,8 @@ background-image: url(https://miro.medium.com/max/1400/1*iA0-8OxW4UWFsp151oR2rg.
 
 
 ---
+class: left, top 
+### Visualizing changes in renewable energy shares
 ```{r leaflet-data, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
 leaflettdata <- alldata %>%
   filter(year >= 1990) %>%
@@ -286,13 +292,13 @@ testleaflet <- leaflettdata %>%
   filter(year == "2018")
 ```
 
-```{r filter-worldspdf-hippo, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+```{r filter-worldspdf-joining, message = FALSE, warning = FALSE}
 testleaflet <- testleaflet %>% 
   left_join(world_spdf2, by = c("country" = "NAME")) %>%
   st_as_sf()
 ```
 
-```{r recent-leaflet, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
+```{r recent-leaflet, message = FALSE, warning = FALSE}
 #2018 leaflet 
 pal2 <- colorNumeric(palette = "RdYlGn", domain = testleaflet$renewables_share_energy)
 labels <- sprintf("<strong>%s</strong><br/>%s ", testleaflet$country, testleaflet$renewables_share_energy) %>%
@@ -310,8 +316,6 @@ m <- leaflet(data = testleaflet) %>%
   addLegend("bottomleft", pal = pal2, values = ~testleaflet$renewables_share_energy,
     title = "2018 Renewable<br> Energy Share",
     opacity = 1)
-
-m
 
 ```
 
@@ -345,6 +349,7 @@ b <- leaflet(data = ninetyleaflet) %>%
     opacity = 1) 
 b
 ```
+---
 class: center, middle
 ```{r final-leaflet, echo = FALSE, message = FALSE, warning = FALSE}
 leafsync::sync(b,m, ncol = 2, sync = "all")
@@ -377,7 +382,7 @@ ggplotly(fossil_fuel_graph)
 ---
 class: left 
 ## What do these trends look like in the future? 
-```{r fossil-predictions-china, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
+```{r fossil-predictions-china, include = FALSE, message = FALSE, warning = FALSE}
 year_1990_china <- fossildata %>%
   filter(country == "China") %>%
   select(country, year, fossil_fuel_consumption)
@@ -407,7 +412,7 @@ new_fossil_china <- new_fossil_china %>%
            year_1990_china$fossil_fuel_consumption)
 ```
 
-```{r fossil-predictions-USA, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
+```{r fossil-predictions-USA, include = FALSE, echo = FALSE,  message = FALSE, warning = FALSE}
 year_1990_USA <- fossildata %>%
   filter(country == "United States") %>%
   select(country, year, fossil_fuel_consumption)
@@ -424,7 +429,9 @@ year_1990_USA <- rbind(year_1990_USA, d)
 year_1990_USA <- rbind(year_1990_USA, e)
 year_1990_USA$year <- as.numeric(year_1990_USA$year)
 
- 
+```
+
+```{r linear-regression-fossil-fuels, message = FALSE, warning = FALSE}
 m_USA <- linear_reg() %>%
   set_engine("lm") %>%
   fit(fossil_fuel_consumption ~ year, data = year_1990_USA)
@@ -436,6 +443,9 @@ new_fossil_USA <- new_fossil_USA %>%
   mutate(predicted = predict(m_USA, year_1990_USA)$.pred, 
          actual = year_1990_USA$fossil_fuel_consumption) 
 ```
+---
+class: left, top
+### Results of our linear model
 .center[
 ```{r USA-vs-China-fossil-predictions, echo = FALSE, message = FALSE, warning = FALSE}
 fossil_preds <- rbind(new_fossil_china, new_fossil_USA)
@@ -456,15 +466,40 @@ ggplot(data = fossil_preds, mapping = aes(color = country)) +
 ```
 ]
 ---
+class: left, top
+### Who is produced the most carbon emissions from electricity in 2018? 
+
+```{r carbon-emissions, echo = FALSE, out.height="50%"}
+pal2 <- colorNumeric(palette = "YlOrRd", domain = testleaflet$carbon_intensity_elec)
+labels <- sprintf("<strong>%s</strong><br/>%s ", testleaflet$country, testleaflet$carbon_intensity_elec) %>%
+  lapply(htmltools::HTML)
+
+q <- leaflet(data = testleaflet) %>% 
+  addTiles()  %>% 
+  setView( lat=53, lng=9 , zoom=3) %>%
+  addPolygons(fillColor = ~pal2(testleaflet$carbon_intensity_elec),
+                                 fillOpacity = 1, 
+                                 color = "white",
+                                 opacity = 0.7,
+                                 weight = 1,
+                                 label = labels) %>%
+  addLegend("bottomleft", pal = pal2, values = ~testleaflet$carbon_intensity_elec,
+    title = "2018 Carbon Emissions",
+    opacity = 1)
+
+q
+```
+
+---
 class: inverse, left, top
 background-image: url(https://www.science.org/do/10.1126/science.aax7477/abs/solar_16x9_2.jpg)
 ### Who are the leaders in renewables: breaking down the difference between total consumption and per capita
 
 ---
-class: left 
+class: left, top
 ## Leaders in Wind 
-.pull-left[
-```{r wind-consumption-all_countries-plot, echo=FALSE, out.width = "50%", out.height = "50%", message=FALSE, warning=FALSE}
+
+```{r wind-consumption-all_countries-plot, include = FALSE, echo=FALSE, out.width = "50%", out.height = "50%", message=FALSE, warning=FALSE}
 wind_consumption_data <- cleandata %>%
   filter(year >= 2000) %>%
   select(wind_consumption, year, country) 
@@ -479,11 +514,10 @@ wind_consumption_graph <- ggplot(data = wind_consumption_data, mapping = aes(x =
        x = "Year",
        y = "Primary Energy from Wind (TWh)")  
 
-ggplotly(wind_consumption_graph)
+windcons <- ggplotly(wind_consumption_graph)
 ```
-]
-.pull-right[
-```{r wind-consumption-per-capita-all_countries-plot, out.width = "50%", out.height = "50%", fig.alt= "Line graph of wind consumption per capita per country per year."}
+
+```{r wind-consumption-per-capita-all_countries-plot, out.width = "50%", out.height = "50%", echo = FALSE, fig.alt= "Line graph of wind consumption per capita per country per year."}
 wind_energy_per_capita_data <- cleandata %>%
   filter(year >= 2000) %>%
   select(wind_energy_per_capita, year, country) 
@@ -498,14 +532,27 @@ wind_energy_per_capita_graph <- ggplot(data = wind_energy_per_capita_data, mappi
        x = "Year",
        y = "Primary Energy from Wind per Capita (TWh)")
 
-ggplotly(wind_energy_per_capita_graph)
+windcap <- ggplotly(wind_energy_per_capita_graph)
+
+wind_energy_per_capita_graph + wind_consumption_graph
 
 ```
 
-]
 
+--- 
+class: left, top
+### Conclusions
 
 ---
+class: left, top 
+### Areas of Improvement for our Analysis and Data
+
+---
+class: center, middle
+background-image:url(https://multifiles.pressherald.com/uploads/sites/10/2019/10/10872983_SJ.CITaerialFoliageSAPV.101419_1.jpg)
+### Questions? 
+---
+
 # Layouts
 
 
