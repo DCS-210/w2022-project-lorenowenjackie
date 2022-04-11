@@ -256,7 +256,8 @@ ggplot(data = fossil_preds, mapping = aes(color = country)) +
   theme_minimal() +
   geom_label(mapping = aes(x = 2010,
                            y = 40000,
-                           label = 'R^2 China: .946  R^2 USA:  .141'))
+                           label = 'R^2 China: .946  R^2 USA:  .141')) + 
+  ylim(17500, 25000)
 ```
 
 ```{r wind-consumption-all_countries-plot, message = FALSE, echo = FALSE, warning = FALSE, fig.alt= "Line graph of wind consumption per country per year."}
@@ -406,8 +407,12 @@ solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data,
        x = "Year",
        y = "Primary Energy from Solar per Capita (TWh)")
 
+
 solar_energy_per_capita_graph
 ```
+
+
+
 
 ```{r nuclear-consumption-all-plot, fig.alt= "Line graph of nuclear consumption per country per year. "}
 nuclear_consumption_data <- cleandata %>%
@@ -442,5 +447,4 @@ nuclear_energy_per_capita_graph <- ggplot(data = nuclear_consumption_per_capita_
        y = "Primary Energy from Nuclear (TWh)")
 
 nuclear_energy_per_capita_graph
-``` 
-
+```
