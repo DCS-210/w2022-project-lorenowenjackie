@@ -147,14 +147,14 @@ Poudel, P, _World Energy Consumption: Consumption of energy by different countri
 
 ### Plots
 ```{r fossil-fuel-consumption-plot, echo = FALSE, message = FALSE, warning = FALSE}
-fossildata <- cleandata %>%
+fossilanim <- cleandata %>%
   select(fossil_fuel_consumption, year, country) %>%
   filter(country == c("United States", "China"),
          year >= 1990,
          year <= 2018)
 
 
-fossil_fuel_graph <- ggplot(data = fossildata, mapping = aes(x = year, 
+fossil_fuel_graph <- ggplot(data = fossilanim, mapping = aes(x = year, 
                                         y = fossil_fuel_consumption, 
                                         color = country)) +
   geom_point() + 
