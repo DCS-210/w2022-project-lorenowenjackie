@@ -1,12 +1,5 @@
 How Has Energy Consumption Changed in Past History
-================
-<<<<<<< HEAD
-by LorenJackieOwen
-=======
-
 by Loren, Jackie, Owen
-
->>>>>>> c6ceb2c81577ef42201db6352e19f0e8cdb23bf3
 
 ## Introduction
 
