@@ -1,18 +1,18 @@
 ---
-title: "World Renewable Energy Consumption"
-subtitle: "For Europe, the UK, the US, Canada, and China"
+title: "World Energy Consumption"
+subtitle: "For 1990-2020"
 author: "Loren, Owen, and Jackie"
 institute: "Bates College"
 date: "`r Sys.Date()`"
 output:
-  xaringan::moon_reader:
+  xaringan::moon_reader:  
     css: xaringan-themer.css
     lib_dir: libs
     nature:
       ratio: "16:9"
       highlightStyle: github
       highlightLines: true
-      countIncrementalSlides: false
+      countIncrementalSlides: false 
 ---
 
 ```{r load-packages, include = FALSE}
@@ -27,12 +27,16 @@ library(sf)
 library(plotly)
 library(gganimate)
 library(gifski)
+library(leafsync)
+library(htmltools)
+library(patchwork)
 ```
 
 ```{r setup, include=FALSE}
 # For better figure resolution
 knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618, out.width = "80%")
 ```
+
 
 ```{r load-data, include=FALSE}
 energy <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
@@ -52,10 +56,10 @@ library(dplyr)
 world_spdf@data$POP2005[ which(world_spdf@data$POP2005 == 0)] = NA
 world_spdf@data$POP2005 <- as.numeric(as.character(world_spdf@data$POP2005)) / 1000000 %>% round(2)
 
-
+ 
 ```
 
-```{r clean-data} 
+```{r clean-data, include=FALSE} 
 cleandata <- alldata %>%
   filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
   select(country,
@@ -94,73 +98,157 @@ cleandata <- alldata %>%
 #use this data for line plots etc (more consolidated country list)
 ```
 
-```{r}
+```{r title-slide, include = FALSE}
 style_xaringan(
-  title_slide_background_image = "img/confetti.jpg"
+  title_slide_background_image = "img/earth.jpeg"
 )
 ```
 
 
-class: center, middle, testing 
-
-## A statement of the overall goal / research question
-
----
-
-class: inverse, center, middle
-
-# Section title
-
----
-
-# Hello World
-
-- Click the `Knit` button to compile your presentation
-
-- Make sure to commit and push all resulting files to your GitHub repo
-
----
-
-class: inverse, middle, center
-
-# Using xaringan
-
----
-
-# xaringan
-
-- The presentation is created using the `xaringan` package
-
-- Use `---` to separate slides and `--` for incremental builds
-
---
-
-- Like this
-
----
-
-# Layouts
-
-You can use plain text
-
-- or bullet points
-
+### We see the impact of climate change in the news and all around us every day, but what are countries doing about it? 
 .pull-left[
-or text in two columns $^*$
+- A recent report from the Intergovernmental Panel on Climate Change highlighted that the world needs to invest three to six times what it’s currently spending on mitigating climate change if it wants to limit global warming to 1.5 or 2 degrees Celsius (1)
+
+- Although wealthier countries contribute the most to climate change, poor countries feel the effects disproportionately
 ]
+
 .pull-right[
-- like
-- this
+```{r climatechange, echo = FALSE, out.width = "80%", fig.align= "right", fig.cap = "The Caldor fire in Eldorado National Forest near Pollock Pines, Calif., last year. [2]" }
+
+include_graphics("img/wildfire.jpeg")
+
+```
 ]
+.footnote[
+[1] Source: Zhong, Raymond. “5 Takeaways From the U.N. Report on Limiting Global Warming.” The New York Times, 4 Apr. 2022, https://www.nytimes.com/2022/04/04/climate/ipcc-report-explained.html. Accessed 10 Apr. 2022.
+[2] Source: Lukpat, Alyssa. "Biden Administration Announces Plan to Spend Billions to Prevent Wildfires." The New York Times, 19 Jan. 2022, https://www.nytimes.com/2022/01/19/climate/biden-administration-wildfire-plan.html
+]
+---
+class: left, middle
+### Our Data 
+.pull-left[- Our data, "World Energy Consumption", consists of key metrics of energy usage from Kaggle. 
+- This data set is part of Our World in Data, which seeks to collect data and research the world's largest problems. 
+- The data set contained 122 columns of variables, and over 17,000 observations for each country from 1900 to the present. There were many observations which had “NA" as their entry.
+- Our analysis is for 1990-2000 for selected countries of interest and their energy consumption
 
 .footnote[
-[*] And add footnotes
+Image credit: Vanja Terzic/iStock.]
+.pull-right[
+```{r renewables, echo = FALSE, out.width = "90%", fig.align= "right", fig.cap = "Wind turbines and solar panels in Palm Springs, California."}
+
+include_graphics("img/windmills.jpeg")
+
+```
 ]
 
+.footnote[Image credit: Vanja Terzic/iStock]
 ---
+class: left
 
-# Code
-```{r leaflet-data}
+### A glimpse of energy consumption
+```{r barchat-data, echo = FALSE, message = FALSE, warning = FALSE}
+#cleaning data to make bar charts 
+barchartdata <- alldata %>%
+  filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
+  select(country,
+         year,
+         wind_consumption, 
+         solar_consumption, 
+         nuclear_consumption,
+         hydro_consumption,
+         biofuel_consumption,
+         coal_consumption,
+         gas_consumption,
+         oil_consumption)
+
+barchartdata <- transform(barchartdata, overall_consumption = (wind_consumption+ 
+         solar_consumption + 
+         nuclear_consumption +
+         hydro_consumption +
+         biofuel_consumption +
+         coal_consumption +
+         gas_consumption +
+         oil_consumption))
+
+
+barcharttransform <- gather(barchartdata, key = "energy_type", value = "consumption", -country, -year, -overall_consumption)
+
+barcharttransform <- barcharttransform[order(-barcharttransform$overall_consumption),]
+
+barcharttransform$country <- factor(barcharttransform$country, 
+ levels = unique(barcharttransform$country))
+  
+```
+.center[
+```{r barchart-transformed-fig, echo=FALSE, fig.height=3.5, fig.width=16, message=FALSE, warning=FALSE}
+barcharttransform %>%
+  filter(year >= 2000) %>%
+  ggplot(aes(x = year, y = overall_consumption, fill = factor(energy_type, 
+                                                   levels = c("oil_consumption",
+                                                              "coal_consumption",
+                                                              "gas_consumption",
+                                                              "nuclear_consumption",
+                                                              "hydro_consumption", 
+                                                              "biofuel_consumption",
+                                                              "wind_consumption", 
+                                                              "solar_consumption")))) +
+  geom_bar(position="stack", stat="identity") + 
+  facet_wrap(vars(country)) + 
+  labs(title = "Energy consumption by country",
+       subtitle = "2000-2020",
+       x = "Year",
+       y = "Primary Energy Consumption (TWh)",
+       fill = "Energy Type") + 
+  theme_minimal() + 
+  scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Hydro", "Biofuel", "Wind", "Solar"))
+```
+]
+---
+class: left
+
+### Distribution of energy in China and US
+.center[
+```{r china-usa-bar, echo=FALSE, out.height= "200%", message=FALSE, warning=FALSE}
+barchartchinausa <- barcharttransform %>%
+  filter(country %in% c("United States", "China"), year >= 2000)
+
+fig <- ggplot(data = barchartchinausa, aes(x = year, 
+                                     y = overall_consumption, 
+                                     fill = factor(energy_type, 
+                                                   levels = c("oil_consumption",
+                                                              "coal_consumption",
+                                                              "gas_consumption",
+                                                              "nuclear_consumption",
+                                                              "hydro_consumption", 
+                                                              "biofuel_consumption",
+                                                              "wind_consumption", 
+                                                              "solar_consumption")))) +
+  geom_area() + 
+  facet_wrap(vars(country)) + 
+  labs(title = "Energy consumption by for China and the USA",
+       subtitle = "2000-2020",
+       x = "Year",
+       y = "Primary Energy Consumption (TWh)",
+       fill = "Energy Type") + 
+  theme_minimal()  + 
+  scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Hydro", "Biofuel", "Wind", "Solar")) 
+
+#+ transition_reveal(year)
+
+fig
+
+```
+]
+---
+class: inverse, bottom
+background-image: url(https://miro.medium.com/max/1400/1*iA0-8OxW4UWFsp151oR2rg.jpeg)
+# Which countries have improved their share of renewable energy the most between 1990-2018?
+
+
+---
+class: left, top 
+### Visualizing changes in renewable energy shares
+```{r leaflet-data, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
 leaflettdata <- alldata %>%
   filter(year >= 1990) %>%
   select(country,
@@ -195,23 +283,23 @@ leaflettdata <- alldata %>%
          biofuel_cons_change_twh,
          biofuel_share_energy,
          biofuel_cons_per_capita,
-         biofuel_consumption)
+         biofuel_consumption,
+         carbon_intensity_elec)
 #use this data for leaflets - uses all countries 
 ```
 
-```{r 2018-data-leaflet}
+```{r 2018-data-leaflet, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
 testleaflet <- leaflettdata %>%
   filter(year == "2018")
 ```
 
-```{r filter-worldspdf-hippo}
+```{r filter-worldspdf-joining, message = FALSE, warning = FALSE}
 testleaflet <- testleaflet %>% 
   left_join(world_spdf2, by = c("country" = "NAME")) %>%
   st_as_sf()
 ```
 
-
-```{r example-leaflet}
+```{r recent-leaflet, message = FALSE, warning = FALSE}
 #2018 leaflet 
 pal2 <- colorNumeric(palette = "RdYlGn", domain = testleaflet$renewables_share_energy)
 labels <- sprintf("<strong>%s</strong><br/>%s ", testleaflet$country, testleaflet$renewables_share_energy) %>%
@@ -226,275 +314,341 @@ m <- leaflet(data = testleaflet) %>%
                                  opacity = 0.7,
                                  weight = 1,
                                  label = labels) %>%
-  addLegend("bottomright", pal = pal2, values = ~testleaflet$renewables_share_energy,
+  addLegend("bottomleft", pal = pal2, values = ~testleaflet$renewables_share_energy,
     title = "2018 Renewable<br> Energy Share",
     opacity = 1)
 
-m
-
 ```
 
-```{r 1990-data-leaflet}
+```{r 1990-data-leaflet, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
 ninetyleaflet <- leaflettdata %>%
   filter(year == "1990")
 ```
 
-```{r filter-worldspdf}
+```{r filter-worldspdf, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
 ninetyleaflet <- ninetyleaflet %>% 
   left_join(world_spdf2, by = c("country" = "NAME")) %>%
   st_as_sf()
 ```
 
-```{r leaflet-attempt}
-#attempt at making leaflet where you can switch between years (uses two data frames)
-pal3 <- colorNumeric(palette = "RdYlGn", domain = ninetyleaflet$renewables_share_energy)
-pal2 <- colorNumeric(palette = "RdYlGn", domain = testleaflet$renewables_share_energy)
-
-#labels <- sprintf("<strong>%s</strong><br/>%s ", ninetyleaflet$country, #ninetyleaflet$renewables_share_energy) %>%
-#  lapply(htmltools::HTML)
+```{r ninety-leaflet, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
+pal2 <- colorNumeric(palette = "RdYlGn", domain = ninetyleaflet$renewables_share_energy)
+labels <- sprintf("<strong>%s</strong><br/>%s ", ninetyleaflet$country, ninetyleaflet$renewables_share_energy) %>%
+  lapply(htmltools::HTML)
 
 b <- leaflet(data = ninetyleaflet) %>% 
   addTiles()  %>% 
-  setView( lat=10, lng=0 , zoom=2) %>%
-  addPolygons(fillColor = ~pal3(ninetyleaflet$renewables_share_energy),
+  setView( lat=10, lng=0 , zoom=1) %>%
+  addPolygons(fillColor = ~pal2(ninetyleaflet$renewables_share_energy),
                                  fillOpacity = 1, 
                                  color = "white",
                                  opacity = 0.7,
                                  weight = 1,
-                                 #label = labels,
-                                 group = "1990") %>%
-   addPolygons(fillColor = ~pal2(testleaflet$renewables_share_energy),
-                                 fillOpacity = 1, 
-                                 color = "white",
-                                 opacity = 0.7,
-                                 weight = 1,
-                                 #label = labels,
-                                 group = "2018") %>%
-   addLayersControl(
-    baseGroups = c("2018", "1990"),
-    options = layersControlOptions(collapsed = FALSE))
-
-    #addLegend("bottomright", pal = pal3, values = ~ninetyleaflet$renewables_share_energy,
-    #title = "1990 Renewable<br> Energy Share",
-    #opacity = 1)
-  
-  
+                                 label = labels) %>%
+  addLegend("bottomleft", pal = pal2, values = ~ninetyleaflet$renewables_share_energy,
+    title = "1990 Renewable<br> Energy Share",
+    opacity = 1) 
 b
 ```
-```{r multi-year-data}
-multiyeardata <- leaflettdata %>%
-  filter(year %in% c("1990", "2018")) %>%
-  mutate(eightteendata = case_when(year == "2018" ~ renewables_share_energy),
-         ninetydata = case_when(year == "1990" ~ renewables_share_energy)
-         )
-
-multiyeardata <- multiyeardata %>% 
-  left_join(world_spdf2, by = c("country" = "NAME")) %>%
-  st_as_sf()
-```
-
-```{r multi-year-leaflet}
-#attempt at making leaflet where you can switch between years using one data frame 
-pal3 <- colorNumeric(palette = "RdYlGn", domain = multiyeardata$ninetydata)
-pal2 <- colorNumeric(palette = "RdYlGn", domain = multiyeardata$eightteendata)
-
-#labels <- sprintf("<strong>%s</strong><br/>%s ", ninetyleaflet$country, #ninetyleaflet$renewables_share_energy) %>%
-#  lapply(htmltools::HTML)
-
-map1 <- leaflet(data = multiyeardata) %>% 
-  addPolygons(fillColor = ~pal2(multiyeardata$eightteendata),
-                                 fillOpacity = 1, 
-                                 color = "white",
-                                 opacity = 0.7,
-                                 weight = 1,
-                                 #label = labels,
-                                 group = "2018") %>%
-  addPolygons(fillColor = ~pal3(multiyeardata$ninetydata),
-                                 fillOpacity = 1, 
-                                 color = "white",
-                                 opacity = 0.7,
-                                 weight = 1,
-                                 #label = labels,
-                                 group = "1990") %>%
-  setView( lat=10, lng=0 , zoom=2) %>%
-   addLayersControl(
-    baseGroups = c("2018", "1990"),
-    options = layersControlOptions(collapsed = FALSE))
-
-    #addLegend("bottomright", pal = pal3, values = ~ninetyleaflet$renewables_share_energy,
-    #title = "1990 Renewable<br> Energy Share",
-    #opacity = 1)
-  
-  
-map1
-```
-
 ---
-
-# Plots
-```{r barchat-data}
-#cleaning data to make bar charts 
-barchartdata <- alldata %>%
-  filter(country %in% c("United States", "Canada", "United Kingdom", "Spain", "France", "Germany", "Switzerland", "Italy", "Norway", "Sweden", "Finland", "China", "Brazil", "India", "Russia", "Japan", "New Zealand", "Australia", "Africa", "South Africa"), year >= 1990) %>%
-  select(country,
-         year,
-         wind_consumption, 
-         solar_consumption, 
-         nuclear_consumption,
-         hydro_consumption,
-         biofuel_consumption,
-         coal_consumption,
-         gas_consumption,
-         oil_consumption)
-
-barchartdata <- transform(barchartdata, overall_consumption = (wind_consumption+ 
-         solar_consumption + 
-         nuclear_consumption +
-         hydro_consumption +
-         biofuel_consumption +
-         coal_consumption +
-         gas_consumption +
-         oil_consumption))
-
-
-barcharttransform <- gather(barchartdata, key = "energy_type", value = "consumption", -country, -year, -overall_consumption)
-
-barcharttransform <- barcharttransform[order(-barcharttransform$overall_consumption),]
-
-barcharttransform$country <- factor(barcharttransform$country, 
- levels = unique(barcharttransform$country))
-  
-colnames(barcharttransform)
+class: center, middle
+```{r final-leaflet, echo = FALSE, message = FALSE, warning = FALSE}
+leafsync::sync(b,m, ncol = 2, sync = "all")
 ```
+---
+class: left
+### Are China and the US committed to reducing fossil fuels? 
+.center[
+```{r fossil-fuel-consumption-plot, out.width="100%", fig.width=2.5, echo=FALSE, message=FALSE, warning=FALSE}
+fossildata <- cleandata %>%
+  select(fossil_fuel_consumption, year, country) %>%
+  filter(country == c("United States", "China")) %>%
+  mutate(year = year - 1990)
 
-```{r barchart-transformed-fig}
-barcharttransform %>%
-  filter(year >= 2000) %>%
-  ggplot(aes(x = year, y = overall_consumption, fill = energy_type)) +
-  geom_bar(position="stack", stat="identity") + 
-  facet_wrap(vars(country)) + 
-  labs(title = "Energy consumption by country",
-       subtitle = "2000-2020",
+
+fossil_fuel_graph <- ggplot(data = fossildata, mapping = aes(x = year, 
+                                        y = fossil_fuel_consumption, 
+                                        color = country)) +
+  geom_point() + geom_smooth(se = FALSE) + 
+  theme_minimal() +
+  labs(title = "Fossil Fuel Consumption for China and the United States",
+       subtitle = "By year",
        x = "Year",
-       y = "Primary Energy Consumption (TWh)",
-       fill = "Energy Type") + 
-  theme_minimal() + 
-  scale_fill_brewer(palette = "RdYlGn")
+       y = "Fossil Fuel Consumption (TWh)",
+       color = "Country")
+
+ggplotly(fossil_fuel_graph)
 ```
+]
+---
+class: left 
+### What do these trends look like in the future? 
+```{r fossil-predictions-china, include = FALSE, message = FALSE, warning = FALSE}
+year_1990_china <- fossildata %>%
+  filter(country == "China") %>%
+  select(country, year, fossil_fuel_consumption)
 
-```{r china-usa-bar}
-barchartchinausa <- barcharttransform %>%
-  filter(country %in% c("United States", "China"), year >= 2000)
+a <- c('China', 32, NA)
+b <- c('China', 34, NA)
+c <- c('China', 36, NA)
+d <- c('China', 38, NA)
+e <- c('China', 40, NA)
+year_1990_china <- rbind(year_1990_china, a)
+year_1990_china <- rbind(year_1990_china, b)
+year_1990_china <- rbind(year_1990_china, c)
+year_1990_china <- rbind(year_1990_china, d)
+year_1990_china <- rbind(year_1990_china, e)
 
-fig <- ggplot( data = barchartchinausa, aes(x = year, 
-                                     y = overall_consumption, 
-                                     fill = energy_type)) +
-  geom_area() + 
-  facet_wrap(vars(country)) + 
-  labs(title = "Energy consumption by for China and the USA",
-       subtitle = "2000-2020",
-       x = "Year",
-       y = "Primary Energy Consumption (TWh)",
-       fill = "Energy Type") + 
-  theme_minimal() + 
-  scale_fill_brewer(palette = "RdYlGn")
+year_1990_china$year <- as.numeric(year_1990_china$year)
 
-ggplotly(fig)
-```
-
-
-```{r leaflet-join-spatial}
-leaflettdata <- leaflettdata %>% 
- left_join(world_spdf2, by = c("country" = "NAME")) %>%
- st_as_sf()
-```
  
-
-```{r recode-species, echo = FALSE}
-# In this chunk I'm doing a bunch of analysis that I don't want to present 
-# in my slides. But I need the resulting data frame for a plot I want to present.
-iris_modified <- iris %>%
-  mutate(Species = fct_other(Species, keep = "setosa"))
+m_china <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(fossil_fuel_consumption ~ year, data = year_1990_china)
+  
+new_fossil_china <- data.frame(year = seq(1990, 2030, by = 2), country =
+                                rep("China", 21 ))
+new_fossil_china <- new_fossil_china %>% 
+  mutate(predicted = predict(m_china, year_1990_china)$.pred, actual =
+           year_1990_china$fossil_fuel_consumption)
 ```
 
-```{r plot-iris, echo = FALSE}
-# Code hidden with echo = FALSE
-# Uses modified iris dataset from previous chunk
-# Play around with height and width until you're happy with the look
-ggplot(data = iris_modified, mapping = aes(x = Sepal.Width, y = Sepal.Length, color = Species)) +
-  geom_point() + 
-  theme_minimal() # theme options: https://ggplot2.tidyverse.org/reference/ggtheme.html
-```
+```{r fossil-predictions-USA, include = FALSE, echo = FALSE,  message = FALSE, warning = FALSE}
+year_1990_USA <- fossildata %>%
+  filter(country == "United States") %>%
+  select(country, year, fossil_fuel_consumption)
 
+a <- c('United States', 32, NA)
+b <- c('United States', 34, NA)
+c <- c('United States', 36, NA)
+d <- c('United States', 38, NA)
+e <- c('United States', 40, NA)
+year_1990_USA <- rbind(year_1990_USA, a)
+year_1990_USA <- rbind(year_1990_USA, b)
+year_1990_USA <- rbind(year_1990_USA, c)
+year_1990_USA <- rbind(year_1990_USA, d)
+year_1990_USA <- rbind(year_1990_USA, e)
+year_1990_USA$year <- as.numeric(year_1990_USA$year)
+
+```
+.center[
+```{r linear-regression-fossil-fuels, fig.align = "center", message = FALSE, warning = FALSE}
+m_USA <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(fossil_fuel_consumption ~ year, data = year_1990_USA)
+  
+new_fossil_USA <- data.frame(year = seq(1990, 2030, by = 2), country =
+                                rep("United States", 21 ))
+
+new_fossil_USA <- new_fossil_USA %>% 
+  mutate(predicted = predict(m_USA, year_1990_USA)$.pred, 
+         actual = year_1990_USA$fossil_fuel_consumption) 
+```
+]
+- Linear regression projecting fossil fuel data from 1900 to 2030
+- Selected code from after data cleaning and transforming
 ---
-
-## Plot and text
-
+class: left, top
+### Results of our linear model
 .pull-left[
-- Some text
-- goes here
+```{r USA-fossil-predictions, echo = FALSE, message = FALSE, warning = FALSE}
+new_fossil_USA
+```
 ]
 .pull-right[
-```{r warning=FALSE, out.width="100%", fig.width=4, echo=FALSE}
-# see how I changed out.width and fig.width from defaults
-# to make the figure bigger
-
+```{r China-fossil-predictions, echo = FALSE, message = FALSE, warning = FALSE}
+new_fossil_china
 ```
 ]
-
 ---
+class: left
+###Plot of actual vs. predicted data
+.center[
+```{r China-USA-fossil-plot, echo = FALSE, message = FALSE, warning = FALSE}
+fossil_preds <- rbind(new_fossil_china, new_fossil_USA)
+ggplot(data = fossil_preds, mapping = aes(color = country)) + 
+  geom_smooth(data = fossil_preds, mapping = aes(x = year, 
+                                                 y = as.numeric(predicted))) + 
+  geom_point(data = fossil_preds, mapping = aes(x = year,
+                                                y = as.numeric(actual))) + 
+  labs(y = 'Fossil Fuel Consumption',
+       x = 'Year',
+       color = 'Country',
+       subtitle = 'Actual vs. Projected Data',
+       title = 'Fossil Fuel Consumption in the USA and China since 1990') +
+  theme_minimal() +
+  geom_label(mapping = aes(x = 2010,
+                           y = 40000,
+                           label = 'R^2 China: .946  R^2 USA:  .141'))
+```
+]
+---
+class: left
+###Plot of actual vs. predicted data, zoomed in
+.center[
+```{r USA-vs-China-fossil-predictions-zoomed, echo = FALSE, message = FALSE, warning = FALSE}
+fossil_preds <- rbind(new_fossil_china, new_fossil_USA)
+ggplot(data = fossil_preds, mapping = aes(color = country)) + 
+  geom_smooth(data = fossil_preds, mapping = aes(x = year, 
+                                                 y = as.numeric(predicted))) + 
+  geom_point(data = fossil_preds, mapping = aes(x = year,
+                                                y = as.numeric(actual))) + 
+  labs(y = 'Fossil Fuel Consumption',
+       x = 'Year',
+       color = 'Country',
+       subtitle = 'Actual vs. Projected Data',
+       title = 'Fossil Fuel Consumption in the USA and China since 1990') +
+  theme_minimal() +
+  geom_label(mapping = aes(x = 2010,
+                           y = 40000,
+                           label = 'R^2 China: .946  R^2 USA:  .141')) + 
+  ylim(17500, 25000)
+```
+]
+---
+class: left, top
+### Who is produced the most carbon emissions from electricity in 2018? 
+```{r carbon-emissions, fig.align = "center", echo = FALSE, out.height="50%"}
+pal2 <- colorNumeric(palette = "YlOrRd", domain = testleaflet$carbon_intensity_elec)
+labels <- sprintf("<strong>%s</strong><br/>%s ", testleaflet$country, testleaflet$carbon_intensity_elec) %>%
+  lapply(htmltools::HTML)
 
-# Tables
+q <- leaflet(data = testleaflet) %>% 
+  addTiles()  %>% 
+  setView( lat=53, lng=9 , zoom=3) %>%
+  addPolygons(fillColor = ~pal2(testleaflet$carbon_intensity_elec),
+                                 fillOpacity = 1, 
+                                 color = "white",
+                                 opacity = 0.7,
+                                 weight = 1,
+                                 label = labels) %>%
+  addLegend("bottomleft", pal = pal2, values = ~testleaflet$carbon_intensity_elec,
+    title = "2018 Carbon Emissions",
+    opacity = 1)
 
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
+q
+```
+- Why haven't other countries beyond Europe produced the carbon emissions? 
+- How do policies surrounding emissions impact available data? 
+---
+class: inverse, left, top
+background-image: url(https://www.science.org/do/10.1126/science.aax7477/abs/solar_16x9_2.jpg)
+## Who are the leaders in renewables: breaking down the difference between total consumption and per capita
+.footnote[Photo credit: CPG Grey]
+---
+class: left, top
+### Leaders in Wind: total consumption
 
-```{r iris-table, echo = FALSE}
-kable(head(iris), format = "html")
+```{r wind-consumption-all_countries-plot, message = FALSE, echo = FALSE, warning = FALSE, fig.alt= "Line graph of wind consumption per country per year."}
+wind_consumption_data <- cleandata %>%
+  filter(year >= 2000) %>%
+  select(wind_consumption, year, country) 
+
+wind_consumption_graph <- ggplot(data = wind_consumption_data, mapping = aes(x = year, 
+                                        y = wind_consumption, 
+                                        color = country))+
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Wind Consumption in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Wind (TWh)")  
+
+ggplotly(wind_consumption_graph)
 ```
 
 ---
+###Leaders in Wind: Per Capita
+```{r wind-consumption-per-capita-all_countries-plot, fig.alt= "Line graph of wind consumption per capita per country per year."}
+wind_energy_per_capita_data <- cleandata %>%
+  filter(year >= 2000) %>%
+  select(wind_energy_per_capita, year, country) 
 
-# Images
+wind_energy_per_capita_graph <- ggplot(data = wind_energy_per_capita_data, mapping = aes(x = year,
+                                        y = wind_energy_per_capita, 
+                                        color = country))+
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Wind Energy per Capita in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Wind per Capita (TWh)")
 
-```{r castle, echo = FALSE, out.width = "60%", fig.align = "center", fig.cap = "Image credit: Photo by Jörg Angeli on Unsplash."}
-include_graphics("https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80")
+ggplotly(wind_energy_per_capita_graph)
+
+```
+--- 
+class: left, top
+## Who leads the world in solar consumption?
+
+```{r solar-consumption-all-plot, fig.align = 'center', fig.alt= "Line graph of solar consumption per country per year. ", echo = FALSE, message = FALSE, warning = FALSE}
+solar_consumption_data <- cleandata %>%
+  filter(year >= 2005) %>%
+  select(solar_consumption, year, country)
+
+
+solar_consumption_graph <- ggplot(data = solar_consumption_data, mapping = aes(x = year, 
+                                        y = solar_consumption, 
+                                        color = country)) +
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Solar Consumption in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Solar (TWh)")
+
+ggplotly(solar_consumption_graph)
 ```
 
-Or you can also include a full page image. See next slide.
-
 ---
+class: left, top
+## And for per capita solar? 
+```{r solar-consumption-per-capita-all-plot, fig.align= 'center',  fig.alt= "Line graph of solar consumption per capita per country per year. "}
+solar_energy_per_capita_data <- cleandata %>%
+  filter(year >= 2005) %>%
+  select(solar_energy_per_capita, year, country)
 
-background-image: url(https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80)
 
----
+solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data, 
+                                        mapping = aes(x = year, y = solar_energy_per_capita, 
+                                                      color = country)) +
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Solar Energy per Capita in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Solar per Capita (TWh)")
 
-# Math Expressions
-
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
-
+ggplotly(solar_energy_per_capita_graph)
 ```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
+---
+class: left, top
+## Conclusions
+- Renewable energy is on the rise, but there has not been substantial increase in renewable energy production for the countries which use the most energy 
+- Smaller countries like Finland and Germany lead the charge in renewable energy
+- Despite efforts to increase renewables, there needs to be greater effort to ween off of fossil fuels 
+- More effort needs to be given to reporting energy usage and sources 
+---
+class: left, top 
+## Areas of Improvement for our Analysis and Data
+Future research directions: 
+- Find more comprehensive datasets for multiple countries/regions and combine for a better understanding of global trends 
+- Further research carbon emissions for countries, not just electricity
+- Understand the relationship between GDP and emissions or renewable generation
+- Research current policies to understand how legislation impacts renewable efforts
 
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-
-Limitations:
-
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
-
-1. There should not be spaces after the opening `$` or before the closing `$`.
-
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
+Statistical analysis: 
+- Understand why the r-squared for our fossil fuel projections for the USA were so low, possible that a more complex model is necessary 
+- Large amount of NA's prevented us from being able to predict some trends 
 
 ---
+class: inverse, center, top
+background-image:url(http://i.imgur.com/ue1ksjY.jpg)
+## Questions? 
 
-# Feeling adventurous?
+.footnote[Photo credit: Bernard Spit Polar Bear (Via Imgur)]
+---
 
-- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
 
-- You are welcomed to use the default styling of the slides. In fact, that's what I expect majority of you will do. You will differentiate yourself with the content of your presentation.
 
-- But some of you might want to play around with slide styling. The 
-`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
 
-- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
