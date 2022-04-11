@@ -452,6 +452,19 @@ new_fossil_USA <- new_fossil_USA %>%
 ---
 class: left, top
 ### Results of our linear model
+.pull-left[
+```{r USA-fossil-predictions, echo = FALSE, message = FALSE, warning = FALSE}
+new_fossil_USA
+```
+]
+.pull-right[
+```{r China-fossil-predictions, echo = FALSE, message = FALSE, warning = FALSE}
+new_fossil_china
+```
+]
+---
+class: left
+###Plot of actual vs. predicted data
 .center[
 ```{r USA-vs-China-fossil-predictions, echo = FALSE, message = FALSE, warning = FALSE, fig.alt= " The visualization predicts the projected values of fossil fuel consumptin in the future. Notice that the prediction model for China is more accurate than the US." }
 fossil_preds <- rbind(new_fossil_china, new_fossil_USA)
@@ -469,6 +482,29 @@ ggplot(data = fossil_preds, mapping = aes(color = country)) +
   geom_label(mapping = aes(x = 2010,
                            y = 40000,
                            label = 'R^2 China: .946  R^2 USA:  .141'))
+```
+]
+---
+class: left
+###Plot of actual vs. predicted data, zoomed in
+.center[
+```{r USA-vs-China-fossil-predictions-zoomed, echo = FALSE, message = FALSE, warning = FALSE}
+fossil_preds <- rbind(new_fossil_china, new_fossil_USA)
+ggplot(data = fossil_preds, mapping = aes(color = country)) + 
+  geom_smooth(data = fossil_preds, mapping = aes(x = year, 
+                                                 y = as.numeric(predicted))) + 
+  geom_point(data = fossil_preds, mapping = aes(x = year,
+                                                y = as.numeric(actual))) + 
+  labs(y = 'Fossil Fuel Consumption',
+       x = 'Year',
+       color = 'Country',
+       subtitle = 'Actual vs. Projected Data',
+       title = 'Fossil Fuel Consumption in the USA and China since 1990') +
+  theme_minimal() +
+  geom_label(mapping = aes(x = 2010,
+                           y = 40000,
+                           label = 'R^2 China: .946  R^2 USA:  .141')) + 
+  ylim(17500, 25000)
 ```
 ]
 ---
