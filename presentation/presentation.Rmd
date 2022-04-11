@@ -127,9 +127,11 @@ include_graphics("img/wildfire.jpeg")
 class: left, middle
 ### Our Data 
 .pull-left[- Our data, "World Energy Consumption", consists of key metrics of energy usage from Kaggle. 
+
 - This data set is part of Our World in Data, which seeks to collect data and research the world's largest problems. 
 - The data set contained 122 columns of variables, and over 17,000 observations for each country from 1900 to the present. There were many observations which had “NA" as their entry.
 - Our analysis is for 1990-2000 for selected countries of interest and their energy consumption
+]
 
 .footnote[
 Image credit: Vanja Terzic/iStock.]
@@ -180,7 +182,7 @@ barcharttransform$country <- factor(barcharttransform$country,
   
 ```
 .center[
-```{r barchart-transformed-fig, echo=FALSE, fig.height=3.5, fig.width=16, message=FALSE, warning=FALSE}
+```{r barchart-transformed-fig, echo=FALSE, fig.height=3.5, fig.width=16, message=FALSE, warning=FALSE, fig.alt= "A quick glimpse of a visual representation of energy consumption for a few developed countries." }
 barcharttransform %>%
   filter(year >= 2000) %>%
   ggplot(aes(x = year, y = overall_consumption, fill = factor(energy_type, 
@@ -208,7 +210,7 @@ class: left
 
 ### Distribution of energy in China and US
 .center[
-```{r china-usa-bar, echo=FALSE, out.height= "200%", message=FALSE, warning=FALSE}
+```{r china-usa-bar, echo=FALSE, out.height= "200%", message=FALSE, warning=FALSE, fig.alt= "A simple visualization comparing energy consumption between the US and China."}
 barchartchinausa <- barcharttransform %>%
   filter(country %in% c("United States", "China"), year >= 2000)
 
@@ -352,14 +354,14 @@ b
 ```
 ---
 class: center, middle
-```{r final-leaflet, echo = FALSE, message = FALSE, warning = FALSE}
+```{r final-leaflet, echo = FALSE, message = FALSE, warning = FALSE, fig.alt= "An interactive comparison between renewable energy share in 1990 and 2018." }
 leafsync::sync(b,m, ncol = 2, sync = "all")
 ```
 ---
 class: left
 ### Are China and the US committed to reducing fossil fuels? 
 .center[
-```{r fossil-fuel-consumption-plot, out.width="100%", fig.width=2.5, echo=FALSE, message=FALSE, warning=FALSE}
+```{r fossil-fuel-consumption-plot, out.width="100%", fig.width=2.5, echo=FALSE, message=FALSE, warning=FALSE, fig.alt= "The visualization shows that fossil fuel consumption has increased rapidly in the past 30 years while the United States consumed fossil fuels at a steady rate." }
 fossildata <- cleandata %>%
   select(fossil_fuel_consumption, year, country) %>%
   filter(country == c("United States", "China")) %>%
@@ -464,7 +466,7 @@ new_fossil_china
 class: left
 ###Plot of actual vs. predicted data
 .center[
-```{r China-USA-fossil-plot, echo = FALSE, message = FALSE, warning = FALSE}
+```{r USA-vs-China-fossil-predictions, echo = FALSE, message = FALSE, warning = FALSE, fig.alt= " The visualization predicts the projected values of fossil fuel consumptin in the future. Notice that the prediction model for China is more accurate than the US." }
 fossil_preds <- rbind(new_fossil_china, new_fossil_USA)
 ggplot(data = fossil_preds, mapping = aes(color = country)) + 
   geom_smooth(data = fossil_preds, mapping = aes(x = year, 
@@ -622,7 +624,6 @@ background-image:url(http://i.imgur.com/ue1ksjY.jpg)
 ## Questions? 
 
 .footnote[Photo credit: Bernard Spit Polar Bear (Via Imgur)]
----
 
 
 
