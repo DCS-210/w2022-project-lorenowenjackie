@@ -306,13 +306,8 @@ solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data, map
        subtitle = "For select countries of interest",
        x = "Year",
        y = "Primary Energy from Solar per Capita (TWh)")
-
-<<<<<<< HEAD
-
 ```
-=======
-ggplotly(solar_energy_per_capita_graph)
-```
+
 
 
 ```{r nuclear-consumption-all-plot, fig.alt= "Line graph of nuclear consumption per country per year. "}
@@ -351,4 +346,3 @@ nuclear_energy_per_capita_graph <- ggplot(data = nuclear_consumption_per_capita_
 nuclear_energy_per_capita_graph
 #ggplotly(nuclear_energy_per_capita_graph)
 ```
->>>>>>> cbbca28058ca4500147374ecc8fb8bf0ae1500ce
