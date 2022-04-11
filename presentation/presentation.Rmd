@@ -188,10 +188,10 @@ barcharttransform %>%
                                                               "coal_consumption",
                                                               "gas_consumption",
                                                               "nuclear_consumption",
-                                                              "wind_consumption", 
-                                                              "solar_consumption", 
                                                               "hydro_consumption", 
-                                                              "biofuel_consumption")))) +
+                                                              "biofuel_consumption",
+                                                              "wind_consumption", 
+                                                              "solar_consumption")))) +
   geom_bar(position="stack", stat="identity") + 
   facet_wrap(vars(country)) + 
   labs(title = "Energy consumption by country",
@@ -200,7 +200,7 @@ barcharttransform %>%
        y = "Primary Energy Consumption (TWh)",
        fill = "Energy Type") + 
   theme_minimal() + 
-  scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Wind", "Solar", "Hydro", "Biofuel"))
+  scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Hydro", "Biofuel", "Wind", "Solar"))
 ```
 ]
 ---
@@ -219,10 +219,10 @@ fig <- ggplot(data = barchartchinausa, aes(x = year,
                                                               "coal_consumption",
                                                               "gas_consumption",
                                                               "nuclear_consumption",
-                                                              "wind_consumption", 
-                                                              "solar_consumption", 
                                                               "hydro_consumption", 
-                                                              "biofuel_consumption")) )) +
+                                                              "biofuel_consumption",
+                                                              "wind_consumption", 
+                                                              "solar_consumption")))) +
   geom_area() + 
   facet_wrap(vars(country)) + 
   labs(title = "Energy consumption by for China and the USA",
@@ -231,7 +231,10 @@ fig <- ggplot(data = barchartchinausa, aes(x = year,
        y = "Primary Energy Consumption (TWh)",
        fill = "Energy Type") + 
   theme_minimal()  + 
-  scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Wind", "Solar", "Hydro", "Biofuel"))
+  scale_fill_brewer(palette = "RdYlGn", labels = c("Oil", "Coal", "Gas", "Nuclear", "Hydro", "Biofuel", "Wind", "Solar")) 
+
+#+ transition_reveal(year)
+
 fig
 
 ```
@@ -501,50 +504,89 @@ background-image: url(https://www.science.org/do/10.1126/science.aax7477/abs/sol
 class: left, top
 ### Leaders in Wind: total consumption
 
-```{r wind-consumption-all_countries-plot, echo=FALSE, out.width = "60%", out.height = "60%", message=FALSE, warning=FALSE}
+```{r wind-consumption-all_countries-plot, message = FALSE, echo = FALSE, warning = FALSE, fig.alt= "Line graph of wind consumption per country per year."}
 wind_consumption_data <- cleandata %>%
   filter(year >= 2000) %>%
   select(wind_consumption, year, country) 
 
 wind_consumption_graph <- ggplot(data = wind_consumption_data, mapping = aes(x = year, 
                                         y = wind_consumption, 
-                                        fill = country))+
-  geom_area() +
-  #stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+                                        color = country))+
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
   theme_minimal() + 
   labs(title = "Wind Consumption in the Past 20 Years",
        subtitle = "For select countries of interest",
        x = "Year",
-       y = "Primary Energy from Wind (TWh)")  +
-  transition_reveal(year)
+       y = "Primary Energy from Wind (TWh)")  
 
-wind_consumption_graph
+ggplotly(wind_consumption_graph)
 ```
+
 ---
 ###Leaders in Wind: Per Capita
-```{r wind-consumption-per-capita-all_countries-plot, out.width = "60%", out.height = "60%", echo = FALSE, warning = F, message = F, fig.alt= "Line graph of wind consumption per capita per country per year."}
+```{r wind-consumption-per-capita-all_countries-plot, fig.alt= "Line graph of wind consumption per capita per country per year."}
 wind_energy_per_capita_data <- cleandata %>%
   filter(year >= 2000) %>%
   select(wind_energy_per_capita, year, country) 
 
 wind_energy_per_capita_graph <- ggplot(data = wind_energy_per_capita_data, mapping = aes(x = year,
                                         y = wind_energy_per_capita, 
-                                        fill = country))+
-  geom_area()+
-  #stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+                                        color = country))+
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
   theme_minimal() + 
   labs(title = "Wind Energy per Capita in the Past 20 Years",
        subtitle = "For select countries of interest",
        x = "Year",
-       y = "Primary Energy from Wind per Capita (TWh)") + 
-  transition_reveal(year)
+       y = "Primary Energy from Wind per Capita (TWh)")
 
-wind_energy_per_capita_graph
+ggplotly(wind_energy_per_capita_graph)
 
 ```
-
-
 --- 
+class: left, top
+## Who leads the world in solar consumption?
+
+```{r solar-consumption-all-plot, fig.align = 'center', fig.alt= "Line graph of solar consumption per country per year. ", echo = FALSE, message = FALSE, warning = FALSE}
+solar_consumption_data <- cleandata %>%
+  filter(year >= 2005) %>%
+  select(solar_consumption, year, country)
+
+
+solar_consumption_graph <- ggplot(data = solar_consumption_data, mapping = aes(x = year, 
+                                        y = solar_consumption, 
+                                        color = country)) +
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Solar Consumption in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Solar (TWh)")
+
+ggplotly(solar_consumption_graph)
+```
+
+---
+class: left, top
+## And for per capita solar? 
+```{r solar-consumption-per-capita-all-plot, fig.align= 'center',  fig.alt= "Line graph of solar consumption per capita per country per year. "}
+solar_energy_per_capita_data <- cleandata %>%
+  filter(year >= 2005) %>%
+  select(solar_energy_per_capita, year, country)
+
+
+solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data, 
+                                        mapping = aes(x = year, y = solar_energy_per_capita, 
+                                                      color = country)) +
+  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+  theme_minimal() + 
+  labs(title = "Solar Energy per Capita in the Past 20 Years",
+       subtitle = "For select countries of interest",
+       x = "Year",
+       y = "Primary Energy from Solar per Capita (TWh)")
+
+ggplotly(solar_energy_per_capita_graph)
+```
+---
 class: left, top
 ## Conclusions
 - Renewable energy is on the rise, but there has not been substantial increase in renewable energy production for the countries which use the most energy 
@@ -572,131 +614,6 @@ background-image:url(http://i.imgur.com/ue1ksjY.jpg)
 .footnote[Photo credit: Bernard Spit Polar Bear (Via Imgur)]
 ---
 
-# Layouts
 
 
 
-You can use plain text
-
-- or bullet points
-
-.pull-left[
-or text in two columns $^*$
-]
-.pull-right[
-- like
-- this
-]
-
-.footnote[
-[*] And add footnotes
-]
-
----
-
-# Code
-
----
-
-# Plots
-
----
-
-
-```
-
-```{r leaflet-join-spatial}
-# leaflettdata <- leaflettdata %>% 
-#  left_join(world_spdf2, by = c("country" = "NAME")) %>%
- #st_as_sf()
-```
-
-
-```{r recode-species, echo = FALSE}
-# In this chunk I'm doing a bunch of analysis that I don't want to present 
-# in my slides. But I need the resulting data frame for a plot I want to present.
-iris_modified <- iris %>%
-  mutate(Species = fct_other(Species, keep = "setosa"))
-```
-
-```{r plot-iris, echo = FALSE}
-# Code hidden with echo = FALSE
-# Uses modified iris dataset from previous chunk
-# Play around with height and width until you're happy with the look
-ggplot(data = iris_modified, mapping = aes(x = Sepal.Width, y = Sepal.Length, color = Species)) +
-  geom_point() + 
-  theme_minimal() # theme options: https://ggplot2.tidyverse.org/reference/ggtheme.html
-```
-
----
-
-## Plot and text
-
-.pull-left[
-- Some text
-- goes here
-]
-.pull-right[
-```{r warning=FALSE, out.width="100%", fig.width=4, echo=FALSE}
-# see how I changed out.width and fig.width from defaults
-# to make the figure bigger
-
-```
-]
-
----
-
-# Tables
-
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
-
-```{r iris-table, echo = FALSE}
-kable(head(iris), format = "html")
-```
-
----
-
-# Images
-
-```{r castle, echo = FALSE, out.width = "60%", fig.align = "center", fig.cap = "Image credit: Photo by Jörg Angeli on Unsplash."}
-include_graphics("https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80")
-```
-
-Or you can also include a full page image. See next slide.
-
----
-
-background-image: url(https://images.unsplash.com/photo-1535448033526-c0e85c9e6968?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80)
-
----
-
-# Math Expressions
-
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
-
-```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
-
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-
-Limitations:
-
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
-
-1. There should not be spaces after the opening `$` or before the closing `$`.
-
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
-
----
-
-# Feeling adventurous?
-
-- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
-
-- You are welcomed to use the default styling of the slides. In fact, that's what I expect majority of you will do. You will differentiate yourself with the content of your presentation.
-
-- But some of you might want to play around with slide styling. The 
-`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
-
-- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
