@@ -2,7 +2,7 @@
 title: "Project proposal - Global Renewable Energy Trends"
 author: "Loren, Jackie, Owen"
 output: html_document  
----
+--- 
 
 ```{r load-packages, message = FALSE}
 library(tidyverse)
@@ -290,14 +290,15 @@ ggplotly(wind_energy_per_capita_graph)
 
 ```{r solar-consumption-all-plot, fig.alt= "Line graph of solar consumption per country per year. ", echo = FALSE, message = FALSE, warning = FALSE}
 solar_consumption_data <- cleandata %>%
-  filter(year >= 2000) %>%
+  filter(year >= 2005) %>%
   select(solar_consumption, year, country)
 
 
 solar_consumption_graph <- ggplot(data = solar_consumption_data, mapping = aes(x = year, 
                                         y = solar_consumption, 
-                                        color = country)) +
-  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+                                        fill = country)) +
+  geom_area() + 
+  #stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
   theme_minimal() + 
   labs(title = "Solar Consumption in the Past 20 Years",
        subtitle = "For select countries of interest",
@@ -384,12 +385,13 @@ ggplotly(fig, tooltip = c("energy_type", "year"))
 
 ```{r solar-consumption-per-capita-all-plot, fig.alt= "Line graph of solar consumption per capita per country per year. "}
 solar_energy_per_capita_data <- cleandata %>%
-  filter(year >= 2000) %>%
+  filter(year >= 2005) %>%
   select(solar_energy_per_capita, year, country)
 
 
-solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data, mapping = aes(x = year, y = solar_energy_per_capita, color = country)) +
-  stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
+solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data, mapping = aes(x = year, y = solar_energy_per_capita, fill = country)) +
+  geom_area() + 
+  #stat_smooth(geom='line', alpha=0.5, se=FALSE) + 
   theme_minimal() + 
   labs(title = "Solar Energy per Capita in the Past 20 Years",
        subtitle = "For select countries of interest",
@@ -433,6 +435,6 @@ nuclear_energy_per_capita_graph <- ggplot(data = nuclear_consumption_per_capita_
        y = "Primary Energy from Nuclear (TWh)")
 
 nuclear_energy_per_capita_graph
-#ggplotly(nuclear_energy_per_capita_graph)
-```
+ggplotly(nuclear_energy_per_capita_graph)
+``` 
 
