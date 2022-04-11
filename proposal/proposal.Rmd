@@ -304,6 +304,7 @@ solar_consumption_graph <- ggplot(data = solar_consumption_data, mapping = aes(x
        x = "Year",
        y = "Primary Energy from Solar (TWh)")
 
+ggplotly(solar_consumption_graph)
 ```
 
 
