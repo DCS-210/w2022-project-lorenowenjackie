@@ -1,12 +1,6 @@
 How Has Energy Consumption Changed in Past History
 ================
-<<<<<<< HEAD
-by LorenJackieOwen
-=======
-
 by Loren, Jackie, Owen
-
->>>>>>> c6ceb2c81577ef42201db6352e19f0e8cdb23bf3
 
 ## Introduction
 
@@ -95,27 +89,7 @@ the amount of fossil fuel as china. By 2030, China is predicted to
 consume about twice as much fossil fuel as the USA. Perhaps China will
 consider utilizing a higher proportion of renewable sources as their
 energy demands continue to grow. Our figures show that China and the
-<<<<<<< HEAD
-United State consume the most energy, but have made little overall
-=======
 United States consume the most energy, but have made little overall
-<<<<<<< HEAD
->>>>>>> c6ceb2c81577ef42201db6352e19f0e8cdb23bf3
-progress to diversity their energy consumption in comparison to
-countries like Finland. With that, our visualization show that smaller
-countries with less energy usage lead the charge in renewables, possibly
-because they do not have to generate as much to support their smaller
-populations. Our bar chart shows that renewable sources are generally
-evenly contributing to energy consumption in the US and China.
-Additionally, our figures show an interesting relationship between
-leaders in solar, wind, and nuclear which depends on whether we look at
-per capita, or overall generation. We can see that usually larger
-countries technically produce more renewable energy, but this makes up a
-much smaller percentage of their total energy consumption. If we look at
-per capita, we see that smaller countries are in fact leaders.
-<<<<<<< HEAD
-=======
-=======
 progress to diversify their energy consumption in comparison to
 countries like Finland. With that, our visualizations show that smaller
 countries with less energy usage lead the charge in renewables, possibly
@@ -129,8 +103,6 @@ countries produce more total renewable energy, but this makes up a much
 smaller percentage of their total energy consumption. If we look at per
 capita, we see that smaller countries are in fact leaders in renewable
 energy generation/consumption.
->>>>>>> 4329ed06166ea074f24d8c8caebed0ea6e902dfc
->>>>>>> c6ceb2c81577ef42201db6352e19f0e8cdb23bf3
 
 ## Presentation
 
