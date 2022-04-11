@@ -356,7 +356,7 @@ leafsync::sync(b,m, ncol = 2, sync = "all")
 ---
 class: left
 ### Are China and the US committed to reducing fossil fuels? 
-.center[
+.center[ 
 <p align="center">
   <iframe src="https://dcs-210.github.io/w2022-project-lorenowenjackie/proposal/map_anim.gif" width="1016" height="516" frameBorder="0"></iframe>
 </p>
