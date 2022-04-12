@@ -1,0 +1,93 @@
+title: "World Energy Consumption"
+subtitle: "For 1990-2020"
+author: "Loren, Owen, and Jackie"
+institute: "Bates College"
+date: "`r Sys.Date()`"
+
+```{r load-packages, include = FALSE}
+# Add any additional packages you need to this chunk
+library(tidyverse)
+library(tidymodels)
+library(knitr)
+library(xaringanthemer)
+library(leaflet)
+library(rgdal)
+library(sf)
+library(plotly)
+library(gganimate)
+library(gifski)
+library(leafsync)
+library(htmltools)
+library(patchwork)
+```
+
+```{r setup, include=FALSE}
+# For better figure resolution
+knitr::opts_chunk$set(fig.retina = 3, dpi = 300, fig.width = 6, fig.asp = 0.618, out.width = "80%")
+```
+
+
+```{r load-data, include=FALSE}
+energy <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
+
+alldata <- read_csv("/cloud/project/data/WorldEnergyConsumption.csv")
+
+world_spdf <- readOGR( 
+  dsn= ("/cloud/project/data/"), 
+  layer="TM_WORLD_BORDERS_SIMPL-0.3",
+  verbose=FALSE
+)
+
+world_spdf2 <- st_read("/cloud/project/data/TM_WORLD_BORDERS_SIMPL-0.3.shp")
+
+# Clean the data object
+library(dplyr)
+world_spdf@data$POP2005[ which(world_spdf@data$POP2005 == 0)] = NA
+world_spdf@data$POP2005 <- as.numeric(as.character(world_spdf@data$POP2005)) / 1000000 %>% round(2)
+
+ 
+```
+
+```{r leaflet-data, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+leaflettdata <- alldata %>%
+  filter(year >= 1990) %>%
+  select(country,
+         year,
+         carbon_intensity_elec)
+#use this data for leaflets - uses all countries
+```
+
+```{r 2018-data-leaflet, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+testleaflet <- leaflettdata %>%
+  filter(year == "2016")
+```
+
+```{r filter-worldspdf-joining, message = FALSE, warning = FALSE}
+carbonleaflet <- testleaflet %>%
+  left_join(world_spdf2, by = c("country" = "NAME")) %>%
+  st_as_sf()
+```
+
+
+```{r carbon-emissions, fig.align = "center", echo = FALSE, out.height="50%"}
+  pal2 <- colorNumeric(palette = "YlOrRd", domain = carbonleaflet$carbon_intensity_elec)
+  labels <- sprintf("<strong>%s</strong><br/>%s ", carbonleaflet$country, carbonleaflet$carbon_intensity_elec) %>%
+   lapply(htmltools::HTML)
+ 
+  q <- leaflet(data = carbonleaflet) %>%
+    addTiles()  %>%
+    setView( lat=53, lng=9 , zoom=3) %>%
+    addPolygons(fillColor = ~pal2(carbonleaflet$carbon_intensity_elec),
+                                   fillOpacity = 1,
+                                   color = "white",
+                                   opacity = 0.7,
+                                   weight = 1,
+                                   label = labels) %>%
+    addLegend("bottomleft", pal = pal2, values = ~carbonleaflet$carbon_intensity_elec,
+      title = "2018 Carbon Emissions",
+      opacity = 1)
+  
+  q
+
+
+```
