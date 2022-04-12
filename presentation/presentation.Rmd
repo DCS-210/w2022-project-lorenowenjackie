@@ -592,10 +592,21 @@ ggplotly(solar_energy_per_capita_graph)
 ---
 class: left, top
 ## Conclusions
+.pull-left[
 - Renewable energy is on the rise, but there has not been substantial increase in renewable energy production for the countries which use the most energy 
 - Smaller countries like Finland and Germany lead the charge in renewable energy
 - Despite efforts to increase renewables, there needs to be greater effort to ween off of fossil fuels 
-- More effort needs to be given to reporting energy usage and sources 
+- More effort needs to be given to reporting energy usage and sources ]
+.pull-right[
+```{r smokestack, echo = FALSE, out.width = "80%", fig.align= "right" }
+
+include_graphics("img/emissions.jpeg")
+
+```
+]
+.footnote[
+Image credit: John MacDougall AFP via Getty Images 
+]
 ---
 class: left, top 
 ## Areas of Improvement for our Analysis and Data
