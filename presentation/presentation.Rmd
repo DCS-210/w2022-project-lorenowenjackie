@@ -357,9 +357,15 @@ leafsync::sync(b,m, ncol = 2, sync = "all")
 ---
 class: left
 ### Are China and the US committed to reducing fossil fuels? 
+.pull-left[
 <p align="center">
   <iframe src="https://dcs-210.github.io/w2022-project-lorenowenjackie/proposal/map_anim.gif" width="5016", height="516", frameBorder="0"></iframe>
-</p>
+</p> ]
+.pull-right[
+- Note the increase in slope for China after 2003, and the gradual decrease in consumption for the US after 2010
+- In 1990, the US used nearly double the amount of fossil fuels as China
+- 3 decades later, China uses nearly twice as much fossil fuels as the US. 
+]
 ---
 class: left
 ### What do these trends look like in the future?
@@ -458,7 +464,7 @@ ggplot(data = fossil_preds, mapping = aes(color = country)) +
                                                  y = as.numeric(predicted))) +
   geom_point(data = fossil_preds, mapping = aes(x = year,
                                                 y = as.numeric(actual))) +
-  labs(y = 'Fossil Fuel Consumption',
+  labs(y = 'Fossil Fuel Consumption (TWh)',
        x = 'Year',
        color = 'Country',
        subtitle = 'Actual vs. Projected Data',
@@ -480,7 +486,7 @@ ggplot(data = fossil_preds, mapping = aes(color = country)) +
                                                  y = as.numeric(predicted))) + 
   geom_point(data = fossil_preds, mapping = aes(x = year,
                                                 y = as.numeric(actual))) + 
-  labs(y = 'Fossil Fuel Consumption',
+  labs(y = 'Fossil Fuel Consumption (TWh)',
        x = 'Year',
        color = 'Country',
        subtitle = 'Actual vs. Projected Data',
