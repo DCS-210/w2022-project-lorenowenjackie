@@ -495,7 +495,9 @@ ggplot(data = fossil_preds, mapping = aes(color = country)) +
 ---
 class: left, top 
 ## Which countries are emitting the most fossil fuels? 
-
+<p align="center">
+  <iframe src="https://dcs-210.github.io/w2022-project-lorenowenjackie/presentation/carbon.html" width="5016", height="516", frameBorder="0"></iframe>
+</p>
 ---
 class: inverse, left, top
 background-image: url(https://www.science.org/do/10.1126/science.aax7477/abs/solar_16x9_2.jpg)

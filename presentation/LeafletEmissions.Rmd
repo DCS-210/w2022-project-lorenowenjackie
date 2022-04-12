@@ -1,9 +1,11 @@
+---
 title: "World Energy Consumption"
 subtitle: "For 1990-2020"
 author: "Loren, Owen, and Jackie"
 institute: "Bates College"
 date: "`r Sys.Date()`"
-
+output: html_document
+---
 ```{r load-packages, include = FALSE}
 # Add any additional packages you need to this chunk
 library(tidyverse)
@@ -19,6 +21,7 @@ library(gifski)
 library(leafsync)
 library(htmltools)
 library(patchwork)
+library(htmlwidgets)
 ```
 
 ```{r setup, include=FALSE}
@@ -62,7 +65,7 @@ testleaflet <- leaflettdata %>%
   filter(year == "2016")
 ```
 
-```{r filter-worldspdf-joining, message = FALSE, warning = FALSE}
+```{r filter-worldspdf-joining, include = FALSE, message = FALSE, warning = FALSE}
 carbonleaflet <- testleaflet %>%
   left_join(world_spdf2, by = c("country" = "NAME")) %>%
   st_as_sf()
@@ -87,7 +90,8 @@ carbonleaflet <- testleaflet %>%
       title = "2018 Carbon Emissions",
       opacity = 1)
   
-  q
+  
+saveWidget(q, file="carbon.html")
 
 
 ```
