@@ -129,7 +129,7 @@ class: left, middle
 
 - This data set is part of Our World in Data, which seeks to collect data and research the world's largest problems. 
 - The data set contained 122 columns of variables, and over 17,000 observations for each country from 1900 to the present. There were many observations which had “NA" as their entry.
-- Our analysis is for 1990-2000 for selected countries of interest and their energy consumption
+- Our analysis is for 1990-2020 for selected countries of interest and their energy consumption
 ]
 
 .pull-right[
@@ -494,7 +494,7 @@ ggplot(data = fossil_preds, mapping = aes(color = country)) +
 ]
 ---
 class: left, top 
-## Which countries are emitting the most fossil fuels? 
+### Carbon emissions from electricity - g CO2/KWh
 <p align="center">
   <iframe src="https://dcs-210.github.io/w2022-project-lorenowenjackie/presentation/carbon.html" width="5016", height="516", frameBorder="0"></iframe>
 </p>
@@ -540,7 +540,7 @@ wind_energy_per_capita_graph <- ggplot(data = wind_energy_per_capita_data, mappi
   labs(title = "Wind Energy per Capita in the Past 20 Years",
        subtitle = "For select countries of interest",
        x = "Year",
-       y = "Primary Energy from Wind per Capita (TWh)")
+       y = "Primary Energy from Wind per Capita (KWh)")
 
 ggplotly(wind_energy_per_capita_graph)
 
@@ -585,7 +585,7 @@ solar_energy_per_capita_graph <- ggplot(data = solar_energy_per_capita_data,
   labs(title = "Solar Energy per Capita in the Past 20 Years",
        subtitle = "For select countries of interest",
        x = "Year",
-       y = "Primary Energy from Solar per Capita (TWh)")
+       y = "Primary Energy from Solar per Capita (KWh)")
 
 ggplotly(solar_energy_per_capita_graph)
 ```
