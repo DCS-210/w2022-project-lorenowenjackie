@@ -598,14 +598,14 @@ class: left, top
 - Despite efforts to increase renewables, there needs to be greater effort to ween off of fossil fuels 
 - More effort needs to be given to reporting energy usage and sources ]
 .pull-right[
-```{r smokestack, echo = FALSE, out.width = "80%", fig.align= "right" }
+```{r smokestack, echo = FALSE, out.width = "90%", fig.align= "right" , fig.alt = "A smokestack emitting gases", fig.cap = " Jaenschwalde Power Station near Peitz, eastern German"}
 
 include_graphics("img/emissions.jpeg")
 
 ```
 ]
 .footnote[
-Image credit: John MacDougall AFP via Getty Images 
+Image credit: John MacDougall/AFP via Getty Images 
 ]
 ---
 class: left, top 
