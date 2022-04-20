@@ -62,7 +62,7 @@ had an easier time increasing their renewable energy shares of their
 total consumption. We also made a smaller subset of this facet, looking
 at only the US and China in further detail using an area chart.
 
-    After determining that the USA and China are by far the largest consumers of fossil fuels, we decided to perform a linear regression in order to model their past consumption and attempt to make future predictions based off of this model.  Based on the R^2 values, we will evaluate whether or not the linear regression model is appropriate to predict these trends. 
+After determining that the USA and China are by far the largest consumers of fossil fuels, we decided to perform a linear regression in order to model their past consumption and attempt to make future predictions based off of this model.  Based on the R^2 values, we will evaluate whether or not the linear regression model is appropriate to predict these trends. 
 
 To understand our next question of who is making the most progress in
 renewables, we decided to make two leaflet plots which visualized the
